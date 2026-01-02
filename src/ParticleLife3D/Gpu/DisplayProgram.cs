@@ -59,7 +59,7 @@ namespace ParticleLife3D.Gpu
             GL.UseProgram(program);
             GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
             GL.Uniform1(particleSizeLocation, particleSize);
-            GL.DrawArrays(PrimitiveType.Points, 0, particlesCount * 9);
+            GL.DrawArrays(PrimitiveType.Points, 0, particlesCount * 27);
         }
     }
 }

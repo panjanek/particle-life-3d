@@ -93,29 +93,7 @@ void torus_dist(inout vec4 d)
         d.z -= config.depth*sign(d.z);
 }
 
-float evaluateForce(const vec2 keypoints[KEYPOINTS_COUNT], float dist)
-{
-    // Clamp distance to valid range
-    dist = clamp(dist, keypoints[0].x, keypoints[5].x);
-
-    // Find the segment [i, i+1] that contains dist
-    for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
-    {
-        float x0 = keypoints[i].x;
-        float x1 = keypoints[i + 1].x;
-
-        if (dist <= x1)
-        {
-            float t = (dist - x0) / (x1 - x0);
-            return mix(keypoints[i].y, keypoints[i + 1].y, t);
-        }
-    }
-
-    // Safety fallback (should never happen)
-    return 0.0;
-}
-
-float evaluateForce2(uint offset, float dist)
+float evaluateForceForOffset(uint offset, float dist)
 {
     for(int i=1; i<KEYPOINTS_COUNT; i++)
         if (forces[i-1].x == forces[i].x)
@@ -163,7 +141,7 @@ void update_one(uint idx)
                  float r = sqrt(r2);
 
                  uint forceOffset = (spec * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
-                 float f = evaluateForce2(forceOffset, r);
+                 float f = evaluateForceForOffset(forceOffset, r);
 
                  acc += config.amp * f * d / r;
              }
@@ -244,5 +222,25 @@ void main()
         duplicate(particle, 6, idx, vec4(config.width, -config.height, 0, 0), flags);
         duplicate(particle, 7, idx, vec4(-config.width, config.height, 0, 0), flags);
         duplicate(particle, 8, idx, vec4(config.width, config.height, 0, 0), flags);
+
+        duplicate(particle, 9, idx, vec4(0, 0, -config.depth, 0), flags);
+        duplicate(particle, 10, idx, vec4(config.width, 0, -config.depth, 0), flags);
+        duplicate(particle, 11, idx, vec4(-config.width, 0, -config.depth, 0), flags);
+        duplicate(particle, 12, idx, vec4(0, config.height, -config.depth, 0), flags);
+        duplicate(particle, 13, idx, vec4(0, -config.height, -config.depth, 0), flags);
+        duplicate(particle, 14, idx, vec4(-config.width, -config.height, -config.depth, 0), flags);
+        duplicate(particle, 15, idx, vec4(config.width, -config.height, -config.depth, 0), flags);
+        duplicate(particle, 16, idx, vec4(-config.width, config.height, -config.depth, 0), flags);
+        duplicate(particle, 17, idx, vec4(config.width, config.height, -config.depth, 0), flags);
+
+        duplicate(particle, 18, idx, vec4(0, 0, config.depth, 0), flags);
+        duplicate(particle, 19, idx, vec4(config.width, 0, config.depth, 0), flags);
+        duplicate(particle, 20, idx, vec4(-config.width, 0, config.depth, 0), flags);
+        duplicate(particle, 21, idx, vec4(0, config.height, config.depth, 0), flags);
+        duplicate(particle, 22, idx, vec4(0, -config.height, config.depth, 0), flags);
+        duplicate(particle, 23, idx, vec4(-config.width, -config.height, config.depth, 0), flags);
+        duplicate(particle, 24, idx, vec4(config.width, -config.height, config.depth, 0), flags);
+        duplicate(particle, 25, idx, vec4(-config.width, config.height, config.depth, 0), flags);
+        duplicate(particle, 26, idx, vec4(config.width, config.height, config.depth, 0), flags);
     }
 }

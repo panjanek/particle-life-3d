@@ -90,6 +90,7 @@ namespace ParticleLife3D.Gpu
             {
                 StopTracking();
                 var delta = (curr - prev);
+                delta.Y = -delta.Y;
                 center -= new Vector4(delta.X, delta.Y, 0, 0);
 
             }, () => { });

@@ -160,7 +160,7 @@ namespace ParticleLife3D.Gpu
                 }
                 GL.GenBuffers(1, out pointsTorusBuffer);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsTorusBuffer);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, 9 * pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, 27 * pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
              }
         }
     }
