@@ -12,6 +12,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using ParticleLife3D.Models;
 using ParticleLife3D.Utils;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using AppContext = ParticleLife3D.Models.AppContext;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -84,6 +85,7 @@ namespace ParticleLife3D.Gpu
             displayProgram = new DisplayProgram();
             UploadParticleData();
 
+            cameraDistance = app.simulation.config.depth;
             center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, 0, 1.0f);
 
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
@@ -113,27 +115,21 @@ namespace ParticleLife3D.Gpu
                     double minDistance = app.simulation.config.width * 10;
                     int closestIdx = 0;
                     var projectionMatrix = GetProjectionMatrix();
-                    var mouseWorld = GpuUtil.ScreenToWorld(new Vector2(e.X, e.Y), projectionMatrix, glControl.Width, glControl.Height);
 
-                    if (mouseWorld.X > app.simulation.config.width)
-                        mouseWorld.X -= app.simulation.config.width;
-                    if (mouseWorld.X < 0)
-                        mouseWorld.X += app.simulation.config.width;
-
-                    if (mouseWorld.Y > app.simulation.config.height)
-                        mouseWorld.Y -= app.simulation.config.height;
-                    if (mouseWorld.Y < 0)
-                        mouseWorld.Y += app.simulation.config.height;
 
                     for (int idx = 0; idx< app.simulation.particles.Length; idx++)
                     {
                         var particlePosition = app.simulation.particles[idx].position;
-                        var distance = Math.Sqrt((particlePosition.X - mouseWorld.X) * (particlePosition.X - mouseWorld.X) + 
-                                                 (particlePosition.Y - mouseWorld.Y) * (particlePosition.Y - mouseWorld.Y));
-                        if (distance < minDistance)
+                        var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
+                        if (screen.HasValue)
                         {
-                            minDistance = distance;
-                            closestIdx = idx;
+                            var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
+                                                     (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
+                            if (distance < minDistance)
+                            {
+                                minDistance = distance;
+                                closestIdx = idx;
+                            }
                         }
                     }
 
@@ -201,6 +197,25 @@ namespace ParticleLife3D.Gpu
             return matrix;
         }
 
+        private Matrix4 GetProjectionMatrix2()
+        {
+            Matrix4 view = Matrix4.LookAt(
+                new Vector3(center.X, center.Y, center.Z + cameraDistance),
+                new Vector3(center.X, center.Y, 0),
+                Vector3.UnitY
+);
+
+            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(60f),
+                glControl.Width / (float)glControl.Height,
+                0.1f,
+                5000f
+            );
+
+            Matrix4 matrix = proj * view;
+            return matrix;
+        }
+
         private void FollowTrackedParticle()
         {
             if (TrackedIdx.HasValue)
@@ -230,7 +245,7 @@ namespace ParticleLife3D.Gpu
         {
             lock (app.simulation)
             {
-                FollowTrackedParticle();
+                //FollowTrackedParticle();
                 displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize);
                 glControl.SwapBuffers();
                 frameCounter++;

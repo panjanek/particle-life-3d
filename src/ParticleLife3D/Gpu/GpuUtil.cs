@@ -58,5 +58,35 @@ namespace ParticleLife3D.Gpu
                 m.M14 * v.X + m.M24 * v.Y + m.M34 * v.Z + m.M44 * v.W
             );
         }
+
+        public static Vector2? World3DToScreen(
+            Vector3 position,
+            Matrix4 projection,
+            int viewportWidth,
+            int viewportHeight)
+        {
+            Vector4 p = new Vector4(position, 1.0f);
+
+            // CRITICAL: row-vector multiply
+            Vector4 clip = Vector4.TransformRow(p, projection);
+
+            if (clip.W <= 0.0f)
+                return null;
+
+            Vector3 ndc = new Vector3(
+                clip.X / clip.W,
+                clip.Y / clip.W,
+                clip.Z / clip.W
+            );
+
+            if (ndc.X < -1 || ndc.X > 1 ||
+                ndc.Y < -1 || ndc.Y > 1)
+                return null;
+
+            float x = (ndc.X * 0.5f + 0.5f) * viewportWidth;
+            float y = viewportHeight - (ndc.Y * 0.5f + 0.5f) * viewportHeight;
+
+            return new Vector2(x, y);
+        }
     }
 }

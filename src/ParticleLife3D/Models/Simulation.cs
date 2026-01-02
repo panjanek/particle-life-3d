@@ -54,12 +54,13 @@ namespace ParticleLife3D.Models
             forces = new Vector4[MaxSpeciesCount * MaxSpeciesCount * KeypointsCount];
         }
 
-        public void StartSimulation(int particlesCount, int speciesCount, float width, float height)
+        public void StartSimulation(int particlesCount, int speciesCount, float width, float height, float depth)
         {
             var previousSpeciesCount = config.speciesCount;
             config.speciesCount = speciesCount;
             config.width = width;
             config.height = height;
+            config.depth = depth;
             config.particleCount = particlesCount;
             InitializeParticles(particlesCount);
             var rnd = new Random(seed);

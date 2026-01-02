@@ -206,7 +206,7 @@ namespace ParticleLife3D.Gui
                         newWidth != app.simulation.config.width ||
                         newHeight != app.simulation.config.height)
                     {
-                        app.simulation.StartSimulation(newParticleCount, newSpeciesCount, newWidth, newHeight);
+                        app.simulation.StartSimulation(newParticleCount, newSpeciesCount, newWidth, newHeight, newHeight);
                         app.renderer.UploadParticleData();
                         ResetMatrix();
                         UpdateActiveControls();
