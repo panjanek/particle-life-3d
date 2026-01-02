@@ -71,8 +71,7 @@ namespace ParticleLife3D.Gpu
             glControl.Dock = DockStyle.Fill;
             host.Child = glControl;
             placeholder.Children.Add(host);
-            glControl.Paint += GlControl_Paint;
-            glControl.SizeChanged += GlControl_SizeChanged;
+
 
             //setup required features
             GL.Enable(EnableCap.ProgramPointSize);
@@ -102,6 +101,8 @@ namespace ParticleLife3D.Gpu
             };
 
             glControl.MouseDown += GlControl_MouseDown;
+            glControl.Paint += GlControl_Paint;
+            glControl.SizeChanged += GlControl_SizeChanged;
         }
 
         public void ResetOrigin()
@@ -246,15 +247,22 @@ namespace ParticleLife3D.Gpu
 
         private void GlControl_Paint(object? sender, PaintEventArgs e)
         {
-            lock (app.simulation)
+            try
             {
-                FollowTrackedParticle();
-                displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize, new Vector2(glControl.Width, glControl.Height));
-                glControl.SwapBuffers();
-                frameCounter++;
-            }
+                lock (app.simulation)
+                {
+                    FollowTrackedParticle();
+                    displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize, new Vector2(glControl.Width, glControl.Height));
+                    glControl.SwapBuffers();
+                    frameCounter++;
+                }
 
-            Capture();
+                Capture();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public void Step()
@@ -278,7 +286,7 @@ namespace ParticleLife3D.Gpu
         private void Capture()
         {
             //combine PNGs into video:
-            //mp4: ffmpeg -f image2 -framerate 60 -i rec1/frame_%05d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -r 60 -vcodec libx264 -pix_fmt yuv420p out.mp4 -y
+            //mp4: ffmpeg -f image2 -framerate 60 -i rec/frame_%05d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -r 60 -vcodec libx264 -pix_fmt yuv420p out.mp4 -y
             //gif: ffmpeg -framerate 60 -ss2 -i rec/frame_%05d.png -vf "select='not(mod(n,2))',setpts=N/FRAME_RATE/TB" -t 5 -r 20 simple2.gif
             //reduce bitrate:  ffmpeg -i in.mp4 -c:v libx264 -b:v 4236000 -pass 2 -c:a aac -b:a 128k out.mp4
             var recDir = app.configWindow.recordDir?.ToString();
