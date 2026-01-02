@@ -17,7 +17,8 @@ layout(std430, binding = 3) buffer OutputBuffer {
 uniform mat4 projection;
 uniform float paricleSize;
 
-layout(location=0) out vec3 vColor;
+layout(location = 0) out vec3 vColor;
+layout(location = 1) out float vDepth;
 
 void main()
 {
@@ -38,6 +39,9 @@ void main()
         gl_PointSize = baseSize*1.5;
 
     gl_PointSize = 10000 * baseSize/ clip.w;
+
+    float depth = clip.w;
+    vDepth = depth;
 
     uint spec = points[id].species;
     const vec3 colors[] = vec3[](
