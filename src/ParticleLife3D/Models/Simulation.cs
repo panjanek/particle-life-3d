@@ -69,10 +69,7 @@ namespace ParticleLife3D.Models
                 {
                     for (int j = 0; j < speciesCount; j++)
                     {
-                        float v1 = (float)(1.5 * config.maxForce * (rnd.NextDouble() - 0.5));
-                        float v2 = (float)(1 * config.maxForce * (rnd.NextDouble() - 0.5));
-                        SetForce(i, j, -config.maxForce*0.5f, v1, v2);
-                        SetForce(j, i, -config.maxForce * 0.5f, v1, v2);
+                        InitialOneForceAtRandom(i, j, rnd);
                     }
                 }
             }
@@ -104,11 +101,16 @@ namespace ParticleLife3D.Models
             {
                 for (int j = 0; j < config.speciesCount; j++)
                 {
-                    float v1 = (float)(1.7*config.maxForce * (rnd.NextDouble() - 0.5));
-                    float v2 = (float)(1*config.maxForce * (rnd.NextDouble() - 0.5));
-                    SetForce(i, j, -config.maxForce * 0.5f, v1, v2);
+                    InitialOneForceAtRandom(i, j, rnd);
                 }
             }
+        }
+
+        public void InitialOneForceAtRandom(int i, int j, Random rnd)
+        {
+            float v1 = (float)(1.7 * config.maxForce * (rnd.NextDouble() - 0.5));
+            float v2 = (float)(1 * config.maxForce * (rnd.NextDouble() - 0.5));
+            SetForce(i, j, -config.maxForce * 0.5f, v1, v2);
         }
 
         public void InitializeParticles(int count)

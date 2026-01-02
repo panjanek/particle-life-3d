@@ -29,7 +29,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(24)] public float height = 1080;
 
-        [FieldOffset(28)] public float maxDist = 100;
+        [FieldOffset(28)] public float maxDist = 300;
 
         [FieldOffset(32)] public int speciesCount = 0;
 

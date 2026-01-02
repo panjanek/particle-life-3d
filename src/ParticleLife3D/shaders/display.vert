@@ -37,10 +37,7 @@ void main()
     if (points[id].flags == 1)
         gl_PointSize = baseSize*1.5;
 
-    
-
-    //gl_Position = projection * vec4(0, 0, 0, 1);
-    gl_PointSize = 1000;
+    gl_PointSize = 10000 * baseSize/ clip.w;
 
     uint spec = points[id].species;
     const vec3 colors[] = vec3[](
@@ -55,57 +52,4 @@ void main()
     );
 
     vColor = colors[spec%8];
-    //vColor = vec3(1.0, 1.0, 1.0);
-
-
-
-    mat4 projection2 = mat4(
-    1.7320508, 0.0,        0.0,             0.0,
-    0.0,       1.7320508,  0.0,             0.0,
-    0.0,       0.0,       -1.0000400,      -1.0,
-    0.0,       0.0,       1999.8800,        2000.0
-    );
-
-    pos = points[id].position;
-    pos.w = 1.0;
-    clip = projection * pos;
-    gl_Position = clip;
-    gl_PointSize = 10000 * baseSize/ clip.w;
-
-    
-    //------------------------------------------------------
-    /*
-    vec3 p = points[id].position.xyz;
-
-    // --- camera parameters (must match your test) ---
-    float camZ = 2000.0;
-    float fov  = radians(60.0);
-    float scale = 1.0 / tan(fov * 0.5);
-
-    // distance from camera
-    float z = camZ - p.z;
-
-    // clip particles behind camera
-    if (z <= 0.0)
-    {
-        gl_Position = vec4(0, 0, 2, 1);
-        return;
-    }
-
-    // manual perspective projection
-    float x = p.x * scale / z;
-    float y = p.y * scale / z;
-
-    gl_Position = vec4(x, y, 0.0, 1.0);
-
-    // --- distance-dependent size ---
-    baseSize = 10000.0;
-    gl_PointSize = baseSize * (scale / z);
-
-    // clamp for safety
-    gl_PointSize = clamp(gl_PointSize, 1.0, 64.0);
-
-
-    gl_Position = vec4(x, y, 0.0, 1.0);*/
-
 }
