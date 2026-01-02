@@ -219,7 +219,7 @@ namespace ParticleLife3D.Gpu
                 var projectionMatrix = GetProjectionMatrix();
                 var tracked = computeProgram.GetTrackedParticle();
                 var trackedPosition = tracked.position;
-                trackedPosition.Z -= 300;
+                trackedPosition.Z -= app.simulation.followDistance;
                 var delta = trackedPosition - center;
                 
                 var move = delta * app.simulation.cameraFollowSpeed;
@@ -249,7 +249,7 @@ namespace ParticleLife3D.Gpu
             lock (app.simulation)
             {
                 FollowTrackedParticle();
-                displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize);
+                displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize, new Vector2(glControl.Width, glControl.Height));
                 glControl.SwapBuffers();
                 frameCounter++;
             }

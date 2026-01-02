@@ -28,13 +28,15 @@ namespace ParticleLife3D.Gpu
             if (projLocation == -1) throw new Exception("Uniform 'projection' not found. Shader optimized it out?");
             particleSizeLocation = GL.GetUniformLocation(program, "paricleSize");
             if (particleSizeLocation == -1) throw new Exception("Uniform 'paricleSize' not found. Shader optimized it out?");
+            viewportSizeLocation = GL.GetUniformLocation(program, "viewportSize");
+            if (viewportSizeLocation == -1) throw new Exception("Uniform 'viewportSize' not found. Shader optimized it out?");
 
             // create dummy vao
             GL.GenVertexArrays(1, out dummyVao);
             GL.BindVertexArray(dummyVao);
         }
 
-        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize)
+        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize)
         {
             GL.Enable(EnableCap.ProgramPointSize);
 
@@ -59,6 +61,7 @@ namespace ParticleLife3D.Gpu
             GL.UseProgram(program);
             GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
             GL.Uniform1(particleSizeLocation, particleSize);
+            GL.Uniform2(viewportSizeLocation, viewportSize);
             GL.DrawArrays(PrimitiveType.Points, 0, particlesCount * 27);
         }
     }

@@ -31,6 +31,8 @@ namespace ParticleLife3D.Models
 
         public int seed = 11;
 
+        public float followDistance = 150; 
+
         //this is for json serialization
         public float[][] F
         {

@@ -16,6 +16,7 @@ layout(std430, binding = 3) buffer OutputBuffer {
 
 uniform mat4 projection;
 uniform float paricleSize;
+uniform vec2 viewportSize;
 
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vDepth;
@@ -42,7 +43,7 @@ void main()
     if (points[id].flags == 1)
         baseSize = baseSize*1.5;
 
-    gl_PointSize = 10000 * baseSize / clip.w;
+    gl_PointSize = viewportSize.x * 5 * baseSize / clip.w;
 
     float depth = clip.w;
     vDepth = depth;
