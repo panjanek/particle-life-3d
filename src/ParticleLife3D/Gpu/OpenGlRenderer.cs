@@ -86,7 +86,7 @@ namespace ParticleLife3D.Gpu
             UploadParticleData();
 
             cameraDistance = app.simulation.config.depth;
-            center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, 0, 1.0f);
+            center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
 
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
             {
@@ -119,18 +119,27 @@ namespace ParticleLife3D.Gpu
 
                     for (int idx = 0; idx< app.simulation.particles.Length; idx++)
                     {
-                        var particlePosition = app.simulation.particles[idx].position;
-                        var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
-                        if (screen.HasValue)
-                        {
-                            var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
-                                                     (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
-                            if (distance < minDistance)
-                            {
-                                minDistance = distance;
-                                closestIdx = idx;
-                            }
-                        }
+                        for (int x = -2; x <= 2; x++)
+                            for (int y = -2; y <= 2; y++)
+                                for (int z = -2; z <= 2; z++)
+                                {
+                                    var particlePosition = app.simulation.particles[idx].position;
+                                    particlePosition.X += x * app.simulation.config.width;
+                                    particlePosition.Y += y * app.simulation.config.height;
+                                    particlePosition.Z += z * app.simulation.config.depth;
+
+                                    var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
+                                    if (screen.HasValue)
+                                    {
+                                        var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
+                                                                 (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
+                                        if (distance < minDistance)
+                                        {
+                                            minDistance = distance;
+                                            closestIdx = idx;
+                                        }
+                                    }
+                                }
                     }
 
                     if (minDistance < 10)
@@ -154,6 +163,7 @@ namespace ParticleLife3D.Gpu
             TrackedIdx = idx;
             app.simulation.config.trackedIdx = TrackedIdx ?? -1;
             computeProgram.Run(app.simulation.config, app.simulation.forces);
+            cameraDistance *= 0.1f;
         }
 
         public void StopTracking()
@@ -181,8 +191,8 @@ namespace ParticleLife3D.Gpu
         private Matrix4 GetProjectionMatrix()
         {
             Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z + cameraDistance),
-                new Vector3(center.X, center.Y, 0),
+                new Vector3(center.X, center.Y, center.Z - cameraDistance),
+                new Vector3(center.X, center.Y, center.Z),
                 Vector3.UnitY
 );
 
@@ -197,33 +207,15 @@ namespace ParticleLife3D.Gpu
             return matrix;
         }
 
-        private Matrix4 GetProjectionMatrix2()
-        {
-            Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z + cameraDistance),
-                new Vector3(center.X, center.Y, 0),
-                Vector3.UnitY
-);
-
-            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(60f),
-                glControl.Width / (float)glControl.Height,
-                0.1f,
-                5000f
-            );
-
-            Matrix4 matrix = proj * view;
-            return matrix;
-        }
-
         private void FollowTrackedParticle()
         {
             if (TrackedIdx.HasValue)
             {
                 var projectionMatrix = GetProjectionMatrix();
                 var tracked = computeProgram.GetTrackedParticle();
-                var trackedScreenPosition = tracked.position;
-                var delta = trackedScreenPosition - center;
+                var trackedPosition = tracked.position;
+                trackedPosition.Z -= 200;
+                var delta = trackedPosition - center;
                 
                 var move = delta * app.simulation.cameraFollowSpeed;
 
@@ -237,6 +229,12 @@ namespace ParticleLife3D.Gpu
                     move.Y = (float)Math.Sign(delta.Y) * app.simulation.config.height;
                 }
 
+                if (Math.Abs(delta.Z) > 0.75 * app.simulation.config.depth)
+                {
+                    move.Z = (float)Math.Sign(delta.Z) * app.simulation.config.depth;
+                }
+
+
                 center += move;
             }
         }
@@ -245,7 +243,7 @@ namespace ParticleLife3D.Gpu
         {
             lock (app.simulation)
             {
-                //FollowTrackedParticle();
+                FollowTrackedParticle();
                 displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize);
                 glControl.SwapBuffers();
                 frameCounter++;
