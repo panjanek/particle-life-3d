@@ -14,10 +14,15 @@ void main()
 
     float m = r > 0.8 ? 1 : 0.8;
 
-    float nearD = 100.0;
-    float farD  = 1000.0;
-    float t = clamp((vDepth - nearD) / (farD - nearD), 0.0, 1.0);
-    
+    //float nearD = 100.0;
+    //float farD  = 1000.0;
+    //float t = clamp((vDepth - nearD) / (farD - nearD), 0.0, 1.0);
+    //outputColor = vec4(vColor*m, 1-t);
 
-    outputColor = vec4(vColor*m, 1-t);
+    float fogDensity = 0.0003;  
+    float fog = exp(-fogDensity * vDepth);
+    fog = clamp(fog, 0.0, 1.0);
+    vec3 color = vColor * fog;
+    outputColor = vec4(color, fog);
+
 }
