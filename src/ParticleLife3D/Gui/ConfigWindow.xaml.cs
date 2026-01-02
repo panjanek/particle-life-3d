@@ -23,7 +23,7 @@ namespace ParticleLife3D.Gui
     /// <summary>
     /// Interaction logic for ConfigWindow.xaml
     /// </summary>
-    public partial class ConfigWindow : Window
+    public unsafe partial class ConfigWindow : Window
     {
         private AppContext app;
 
@@ -38,7 +38,12 @@ namespace ParticleLife3D.Gui
             minimizeButton.Click += (s, e) => WindowState = WindowState.Minimized;
             Closing += (s, e) => { e.Cancel = true; WindowState = WindowState.Minimized; };
             ContentRendered += (s, e) => { UpdateActiveControls(); UpdatePassiveControls(); };
-            forceMatrix.SelectionChanged = () => UpdateGraph();
+            forceMatrix.SelectionChanged = () =>
+            {
+                UpdateGraph();
+                for (int i = 0; i < Simulation.MaxSpeciesCount; i++)
+                    app.simulation.config.disabled[i] = forceMatrix.Disabled[i];
+            };
             randomButton.PreviewKeyDown += (s, e) => e.Handled=true;
             restartButton.PreviewKeyDown += (s, e) => e.Handled = true;
             saveButton.PreviewKeyDown += (s, e) => e.Handled = true;
@@ -268,6 +273,7 @@ namespace ParticleLife3D.Gui
                     WpfUtil.UpdateTextBlockForSlider(this, text, app.simulation);
             forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
             UpdateGraph();
+            forceMatrix.UpdateDots();
         }
     }
 }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace ParticleLife3D.Models
 {
-    [StructLayout(LayoutKind.Explicit, Size = 56)]
-    public struct ShaderConfig
+    [StructLayout(LayoutKind.Explicit, Size = 104)]
+    public unsafe struct ShaderConfig
     {
         public ShaderConfig()
         {
@@ -42,5 +42,11 @@ namespace ParticleLife3D.Models
         [FieldOffset(48)] public float amp = 1f;
 
         [FieldOffset(52)] public float depth = 1000f;
+
+        [FieldOffset(56)] int _pad0;
+
+        [FieldOffset(60)] int _pad1;
+
+        [FieldOffset(64)] public fixed int disabled[Simulation.MaxSpeciesCount];
     }
 }

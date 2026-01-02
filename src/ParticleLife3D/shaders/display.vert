@@ -26,6 +26,10 @@ void main()
 
     vec4 pos = points[id].position;
     pos.w = 1.0;
+    if (points[id].flags == 2)
+        pos.w = 0;
+
+
     vec4 clip = projection * pos;
     gl_Position = clip;
 
@@ -56,5 +60,8 @@ void main()
     );
 
     vColor = colors[spec%8];
+
+    if (points[id].flags == 2)
+        vColor = vec3(0,0,0);
 
 }

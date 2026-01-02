@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using OpenTK.Mathematics;
 using ParticleLife3D.Models;
 using Brush = System.Windows.Media.Brush;
 using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace ParticleLife3D.Gui
@@ -18,20 +20,31 @@ namespace ParticleLife3D.Gui
     {
         private Rectangle[,] rectangles;
 
-        private Brush[] DotColors = [Brushes.Yellow, Brushes.Magenta, Brushes.Cyan, Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.White, Brushes.Gray];
+        private Brush[] DotBrushes = [Brushes.Yellow, Brushes.Magenta, Brushes.Cyan, Brushes.Red, Brushes.Green, Brushes.Blue, Brushes.White, Brushes.Gray];
+
+        private Color[] DotColors = [Colors.Yellow, Colors.Magenta, Colors.Cyan, Colors.Red, Colors.Green, Colors.Blue, Colors.White, Colors.Gray];
 
         public int SelectedX { get; set; }
 
         public int SelectedY { get; set; }
 
+        public int[] Disabled { get; set; }
+
         public Action SelectionChanged { get; set; }
 
         private int speciesCount { get; set; }
+
+        private Ellipse[] verticalDots;
+
+        private Ellipse[] horizontalDots;
 
         public ForceMatrix()
             :base()
         {
             rectangles = new Rectangle[Simulation.MaxSpeciesCount, Simulation.MaxSpeciesCount];
+            verticalDots = new Ellipse[Simulation.MaxSpeciesCount];
+            horizontalDots = new Ellipse[Simulation.MaxSpeciesCount];
+            Disabled = new int[Simulation.MaxSpeciesCount];
             SelectedX = 0;
             SelectedY = 0;
             Loaded += ForceMatrix_Loaded;
@@ -43,14 +56,18 @@ namespace ParticleLife3D.Gui
             var rectSize = Width / Simulation.MaxSpeciesCount;
             for (int x = 0; x < Simulation.MaxSpeciesCount; x++)
             {
-                var dot = new System.Windows.Shapes.Ellipse() { Fill = DotColors[x%DotColors.Length], Width = rectSize * 0.75, Height = rectSize * 0.75, Stroke = Brushes.Blue, StrokeThickness = 1 };
-                dot.SetValue(Canvas.LeftProperty, -rectSize);
-                dot.SetValue(Canvas.TopProperty, x * rectSize);
-                Children.Add(dot);
-                dot = new System.Windows.Shapes.Ellipse() { Fill = DotColors[x % DotColors.Length], Width = rectSize * 0.75, Height = rectSize * 0.75, Stroke = Brushes.Blue, StrokeThickness = 1 };
-                dot.SetValue(Canvas.LeftProperty, rectSize*x);
-                dot.SetValue(Canvas.TopProperty, - rectSize);
-                Children.Add(dot);
+                verticalDots[x] = new System.Windows.Shapes.Ellipse() { Fill = DotBrushes[x%DotBrushes.Length], Width = rectSize * 0.75, Height = rectSize * 0.75, Stroke = Brushes.Black, StrokeThickness = 1 };
+                verticalDots[x].SetValue(Canvas.LeftProperty, -rectSize);
+                verticalDots[x].SetValue(Canvas.TopProperty, x * rectSize);
+                verticalDots[x].Tag = x.ToString();
+                verticalDots[x].MouseDown += Dot_MouseDown;
+                Children.Add(verticalDots[x]);
+                horizontalDots[x] = new System.Windows.Shapes.Ellipse() { Fill = DotBrushes[x % DotBrushes.Length], Width = rectSize * 0.75, Height = rectSize * 0.75, Stroke = Brushes.Black, StrokeThickness = 1 };
+                horizontalDots[x].SetValue(Canvas.LeftProperty, rectSize*x);
+                horizontalDots[x].SetValue(Canvas.TopProperty, - rectSize);
+                horizontalDots[x].MouseDown += Dot_MouseDown;
+                horizontalDots[x].Tag = x.ToString();
+                Children.Add(horizontalDots[x]);
                 for (int y = 0; y < Simulation.MaxSpeciesCount; y++)
                 {
                     var rect = new Rectangle();
@@ -85,6 +102,17 @@ namespace ParticleLife3D.Gui
             }
 
             UpdateSelection();
+            UpdateDots();
+        }
+
+        private void Dot_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var dot = (Ellipse)sender;
+            var i = WpfUtil.GetTagAsInt(dot);
+            Disabled[i] = 1 - Disabled[i];
+            UpdateDots();
+            if (SelectionChanged != null)
+                SelectionChanged();
         }
 
         public void UpdateSelection()
@@ -107,9 +135,28 @@ namespace ParticleLife3D.Gui
                 }
             }
         }
+
+        public void UpdateDots()
+        {
+            for(int i=0; i<Simulation.MaxSpeciesCount; i++)
+            {
+                var mainBrush = DotBrushes[i % DotBrushes.Length];
+                var mainColor = DotColors[i % DotColors.Length];
+                var res = mainBrush;
+                if (Disabled[i] == 1) 
+                    res = new SolidColorBrush(Color.FromArgb(128, (byte)(mainColor.R/2), (byte)(mainColor.G/2), (byte)(mainColor.B/2)));
+
+                if (i >= speciesCount)
+                    res = Brushes.Black;
+
+                horizontalDots[i].Fill = res;
+                verticalDots[i].Fill = res;
+            }
+        }
     
         public void UpdateCells(Vector4[] forces, int speciesCount, float maxForce)
         {
+            UpdateDots();
             this.speciesCount = speciesCount;
             var inactive = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 32, 32, 32));
             for (int x = 0; x < Simulation.MaxSpeciesCount; x++)
