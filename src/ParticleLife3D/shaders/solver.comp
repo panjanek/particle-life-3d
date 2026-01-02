@@ -1,0 +1,248 @@
+﻿#version 430
+
+#pragma optimize(on)
+
+layout(local_size_x = {LocalSizeX}) in;
+
+struct ShaderConfig {
+    int particleCount;
+    float dt;
+    float sigma2;
+    float clampVel;
+    float clampAcc;
+    float width;
+    float height;
+    float maxDist;
+    int speciesCount;
+    float damping;
+    int trackedIdx;
+    float maxForce;
+    float amp;
+    float depth;
+};
+
+struct Particle
+{
+   vec4 position;
+   vec4 velocity;
+   int species;
+   int flags;
+   int  _pad0;
+   int  _pad1;
+};
+
+#define MAX_SPECIES_COUNT     10
+#define KEYPOINTS_COUNT       6
+#define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
+
+layout(std140, binding = 0) uniform ConfigBuffer {
+    ShaderConfig config;
+};
+
+layout(std430, binding = 1) readonly buffer InputBuffer
+{
+    Particle inParticles[];
+};
+
+layout(std430, binding = 2) writeonly buffer OutputBuffer
+{
+    Particle outParticles[];
+};
+
+layout(std430, binding = 3) writeonly buffer VertexBuffer
+{
+    Particle displayParticles[];
+};
+
+layout(std430, binding = 4) readonly buffer ForceBuffer {
+    vec4 forces[];
+};
+
+layout(std430, binding = 5) writeonly buffer TrackingBuffer
+{
+    Particle tracked;
+};
+
+void torus_pos(inout vec4 pos)
+{
+    if (pos.x > config.width)
+        pos.x -= config.width;
+    else if (pos.x < 0)
+        pos.x += config.width;
+
+    if (pos.y > config.height)
+        pos.y -= config.height;
+    else if (pos.y < 0)
+        pos.y += config.height;
+
+    if (pos.z > config.depth)
+        pos.z -= config.depth;
+    else if (pos.z < 0)
+        pos.z += config.depth;
+}
+
+void torus_dist(inout vec4 d)
+{
+    if (abs(d.x) > config.width / 2)
+        d.x -= config.width*sign(d.x);
+
+    if (abs(d.y) > config.height / 2)
+        d.y -= config.height*sign(d.y);
+
+    if (abs(d.z) > config.depth / 2)
+        d.z -= config.depth*sign(d.z);
+}
+
+float evaluateForce(const vec2 keypoints[KEYPOINTS_COUNT], float dist)
+{
+    // Clamp distance to valid range
+    dist = clamp(dist, keypoints[0].x, keypoints[5].x);
+
+    // Find the segment [i, i+1] that contains dist
+    for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
+    {
+        float x0 = keypoints[i].x;
+        float x1 = keypoints[i + 1].x;
+
+        if (dist <= x1)
+        {
+            float t = (dist - x0) / (x1 - x0);
+            return mix(keypoints[i].y, keypoints[i + 1].y, t);
+        }
+    }
+
+    // Safety fallback (should never happen)
+    return 0.0;
+}
+
+float evaluateForce2(uint offset, float dist)
+{
+    for(int i=1; i<KEYPOINTS_COUNT; i++)
+        if (forces[i-1].x == forces[i].x)
+            return 0;
+
+
+    // Clamp distance to valid range
+    dist = clamp(dist, forces[offset].x, forces[offset+5].x);
+
+    // Find the segment [i, i+1] that contains dist
+    for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
+    {
+        float x0 = forces[offset+i].x;
+        float x1 = forces[offset+i + 1].x;
+
+        if (dist <= x1)
+        {
+            float t = (dist - x0) / (x1 - x0);
+            return mix(forces[offset+i].y, forces[offset+i + 1].y, t);
+        }
+    }
+
+    // Safety fallback (should never happen)
+    return 0.0;
+}
+
+
+void update_one(uint idx)
+{
+    vec4 pos = inParticles[idx].position;
+    vec4 vel = inParticles[idx].velocity;
+    int spec = inParticles[idx].species;
+
+    vec4 acc = vec4(0.0);
+    for(uint otherIdx = 0; otherIdx < config.particleCount; otherIdx++)
+        if (idx != otherIdx)
+        {
+             Particle other = inParticles[otherIdx];
+             vec4 d = other.position - pos;
+             torus_dist(d);
+             if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist)
+             {
+
+                 float r2 = dot(d, d) + config.sigma2;
+                 float r = sqrt(r2);
+
+                 uint forceOffset = (spec * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
+                 float f = evaluateForce2(forceOffset, r);
+
+                 acc += config.amp * f * d / r;
+             }
+        }
+
+    //clamp acceleration
+    if (config.clampAcc > 0.0)
+    {
+        float acc2 = dot(acc, acc);
+        float maxAcc2 = config.clampAcc * config.clampAcc;
+        acc *= inversesqrt(max(acc2, maxAcc2)) * config.clampAcc;
+    }
+
+    //integrate velocity
+    vel += acc * config.dt;
+    
+    //clamp velocity
+    if (config.clampVel > 0)
+    {
+        float vel2 = dot(vel, vel);
+        float maxVel2 = config.clampVel * config.clampVel;
+        vel *= inversesqrt(max(vel2, maxVel2)) * config.clampVel;
+    }
+
+    //simple drag
+    //vel *= (1.0 - 0.8 * config.dt);
+    //quadratic drag, works with 0.03f;
+    /*
+    float speed = length(vel);
+    if (speed > 0.0)
+    {
+        vec2 drag = -config.damping * speed * vel;
+        vel += drag * config.dt;
+    }*/
+
+    //exp drag
+    float speed = length(vel);
+    float drag = exp(-config.damping * speed * config.dt);
+    vel *= drag;
+
+    //integrate position
+    pos += vel * config.dt;
+
+    torus_pos(pos);
+    outParticles[idx].position = pos;
+    outParticles[idx].velocity = vel;
+}
+
+void duplicate(Particle particle, uint nr, uint idx, vec4 traslation, int flags)
+{
+    displayParticles[idx + nr * config.particleCount] = particle;
+    displayParticles[idx + nr * config.particleCount].position += traslation;
+    displayParticles[idx + nr * config.particleCount].flags = flags;
+}
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+
+    if (idx >=0 && idx < config.particleCount) 
+    {
+        update_one(idx);
+
+        Particle particle = outParticles[idx];
+        int flags = 0;
+        if (config.trackedIdx > -1 && config.trackedIdx == idx)
+        {
+            flags = 1;
+            tracked = particle;
+        }
+        
+        duplicate(particle, 0, idx, vec4(0, 0, 0, 0), flags);
+        duplicate(particle, 1, idx, vec4(config.width, 0, 0, 0), flags);
+        duplicate(particle, 2, idx, vec4(-config.width, 0, 0, 0), flags);
+        duplicate(particle, 3, idx, vec4(0, config.height, 0, 0), flags);
+        duplicate(particle, 4, idx, vec4(0, -config.height, 0, 0), flags);
+        duplicate(particle, 5, idx, vec4(-config.width, -config.height, 0, 0), flags);
+        duplicate(particle, 6, idx, vec4(config.width, -config.height, 0, 0), flags);
+        duplicate(particle, 7, idx, vec4(-config.width, config.height, 0, 0), flags);
+        duplicate(particle, 8, idx, vec4(config.width, config.height, 0, 0), flags);
+    }
+}

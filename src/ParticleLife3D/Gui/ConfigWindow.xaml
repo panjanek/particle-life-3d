@@ -1,0 +1,219 @@
+﻿<Window x:Class="ParticleLife3D.Gui.ConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ParticleLife3D.Gui"
+        mc:Ignorable="d"
+        Title="ConfigWindow" 
+        Width="350"
+        Height="800"  
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterOwner"
+        WindowState="Normal"
+        ShowInTaskbar="True"
+        WindowStyle="None"
+        AllowsTransparency="False"
+        Opacity="1">
+    <Border Background="#CC2B2B2B"
+            CornerRadius="5"
+            BorderBrush="#444"
+            BorderThickness="1">
+        <DockPanel>
+            <!-- Custom Title Bar -->
+            <Grid Height="32"
+                  DockPanel.Dock="Top"
+                  Background="#FF1E1E1E"
+                  Name="customTitleBar">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Title -->
+                <TextBlock Text="Configuration"
+                           VerticalAlignment="Center"
+                           Margin="10,0,0,0"
+                           Foreground="White"
+                           FontWeight="SemiBold"/>
+
+                <!-- Minimize Button -->
+                <Button Grid.Column="1"
+                        Content="─"
+                        FontSize="14"
+                        Foreground="White"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Name="minimizeButton"
+                        Cursor="Hand"/>
+
+            </Grid>
+
+            <!-- Window Content -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- 9 -->
+
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0" Name="restartButton">Restart</Button>
+                    <Button Grid.Row="0" Grid.Column="1" Name="randomButton">Random</Button>
+                    <Button Grid.Row="0" Grid.Column="2" Name="saveButton">Save</Button>
+                    <Button Grid.Row="0" Grid.Column="3" Name="loadButton">Load</Button>
+                    <ToggleButton Name="recordButton" Grid.Row="0" Grid.Column="4" ToolTip="Record frames as PNG files to given folder" Click="Record_Click">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <!-- Default: red circle -->
+                                        <Ellipse Width="12"
+                             Height="12"
+                             Fill="Red"/>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <!-- When recording -->
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <!-- Stop: black square -->
+                                                <Rectangle Width="12"
+                                       Height="12"
+                                       Fill="Black"/>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                </Grid>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Number of particles" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
+                <ComboBox Name="particlesCount" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
+                    <ComboBoxItem>100</ComboBoxItem>
+                    <ComboBoxItem>1000</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">2500</ComboBoxItem>
+                    <ComboBoxItem>5000</ComboBoxItem>
+                    <ComboBoxItem>10000</ComboBoxItem>
+                    <ComboBoxItem>100000</ComboBoxItem>
+                    <ComboBoxItem>1000000</ComboBoxItem>
+                </ComboBox>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Number of species" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
+                <ComboBox Name="speciesCount" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
+                    <ComboBoxItem>1</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
+                    <ComboBoxItem>3</ComboBoxItem>
+                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem>5</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">6</ComboBoxItem>
+                    <ComboBoxItem>7</ComboBoxItem>
+                    <ComboBoxItem>8</ComboBoxItem>
+                    <ComboBoxItem>9</ComboBoxItem>
+                    <ComboBoxItem>10</ComboBoxItem>
+                </ComboBox>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Size of the field" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
+                <ComboBox Name="fieldSize" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
+                    <ComboBoxItem>320x180</ComboBoxItem>
+                    <ComboBoxItem>720x405</ComboBoxItem>
+                    <ComboBoxItem>1280x720</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">1920x1080</ComboBoxItem>
+                    <ComboBoxItem>2560x1440</ComboBoxItem>
+                    <ComboBoxItem>3840x2160</ComboBoxItem>
+                    <ComboBoxItem>7680x4320</ComboBoxItem>
+                </ComboBox>
+  
+                <!-- dt -->
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="step dt ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Integration step"/>
+                <Slider Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.001" Maximum="1" SmallChange="0.001" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.dt" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="4" Grid.Column="2" Tag="config.dt"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- damping -->
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="damping ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Integration step"/>
+                <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.001" Maximum="2" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.damping" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="5" Grid.Column="2" Tag="config.damping"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- amp -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Force amplification ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Global force amplification"/>
+                <Slider Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="10" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.amp" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="6" Grid.Column="2" Tag="config.amp"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- maxDist -->
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="Max force distance ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Maximum dostance between particles for computing forces. Beyond tht the interaction is ignored"/>
+                <Slider Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="1000" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" Tag="config.maxDist" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="7" Grid.Column="2" Tag="config.maxDist"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- maxForce -->
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="Max force per keypoint ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Maximum force that can be configured for a keypoint"/>
+                <Slider Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="1" Minimum="2" Maximum="100" SmallChange="0.1" LargeChange="0.5" ValueChanged="Slider_ValueChanged" Tag="config.maxForce" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="8" Grid.Column="2" Tag="config.maxForce"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- cameraFollowSpeed -->
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="Speed of camera ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Speed of camera when right-clicked on partice. Does not affect simulation"/>
+                <Slider Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.01" Maximum="1" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="cameraFollowSpeed" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="9" Grid.Column="2" Tag="cameraFollowSpeed"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                
+                <!-- particleSize -->
+                <TextBlock Grid.Row="10" Grid.Column="0" Text="Particle size ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Screen size of particle. Does not affect simulation"/>
+                <Slider Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="10" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="10" Grid.Column="2" Tag="particleSize"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- forces -->
+                <TextBlock Grid.Row="11" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
+                <local:ForceMatrix Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
+                <local:ForceGraph Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
+                <Grid Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Grid.Column="0" Name="invertButton" ToolTip="Invert values (apart from first)">Invert</Button>
+                    <Button Grid.Row="0" Grid.Column="1" Name="symetricButton" ToolTip="Copy values to opposite particle">Symetric</Button>
+                    <Button Grid.Row="0" Grid.Column="2" Name="asymetricButton" ToolTip="Copy Inverted values to opposite particle">Asymetric</Button>
+                    <CheckBox Grid.Row="1" Grid.Column="0" Name="symetricCheckbox" ToolTip="Maintain symetric matrix" Foreground="White">Symetric</CheckBox>
+                    <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Name="everythingSymetricButton" ToolTip="Makes entire matrix symmetric">Make martix symetric</Button>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </Border>
+</Window>
