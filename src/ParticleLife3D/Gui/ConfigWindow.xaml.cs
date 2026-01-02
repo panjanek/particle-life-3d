@@ -49,10 +49,12 @@ namespace ParticleLife3D.Gui
             saveButton.PreviewKeyDown += (s, e) => e.Handled = true;
             loadButton.PreviewKeyDown += (s, e) => e.Handled = true;
             recordButton.PreviewKeyDown += (s, e) => e.Handled = true;
+            backButton.Click += (s, e) => app.renderer.ResetOrigin();
             restartButton.Click += (s, e) => 
             { 
                 app.simulation.InitializeParticles(app.simulation.config.particleCount);
                 app.renderer.UploadParticleData();
+                app.renderer.ResetOrigin();
                 ResetMatrix();
             };
 
@@ -62,6 +64,7 @@ namespace ParticleLife3D.Gui
                 app.simulation.seed++;
                 app.simulation.InitializeRandomForces();
                 app.renderer.UploadParticleData();
+                app.renderer.ResetOrigin();
                 ResetMatrix();
             };
 

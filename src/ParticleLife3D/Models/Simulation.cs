@@ -19,7 +19,7 @@ namespace ParticleLife3D.Models
 
         public ShaderConfig config;
 
-        public float cameraFollowSpeed = 0.05f;
+        public float cameraFollowSpeed = 1f;
 
         public float particleSize = 0.7f;
 
@@ -29,7 +29,7 @@ namespace ParticleLife3D.Models
         [JsonIgnore]
         public Vector4[] forces;
 
-        public int seed = 6;
+        public int seed = 11;
 
         //this is for json serialization
         public float[][] F

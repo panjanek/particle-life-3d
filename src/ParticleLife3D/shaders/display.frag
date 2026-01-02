@@ -9,20 +9,6 @@ uniform vec3 lightDir = normalize(vec3(0.3, 0.5, 1.0));
 
 void main()
 {
-/*
-    vec2 uv = gl_PointCoord * 2.0 - 1.0; 
-    float r = length(uv); 
-    if (r > 1)
-        discard;
-
-    float m = r > 0.8 ? 1 : 0.8;
-
-    float fogDensity = 0.0003;  
-    float fog = exp(-fogDensity * vDepth);
-    fog = clamp(fog, 0.0, 1.0);
-    vec3 color = vColor * fog;
-    outputColor = vec4(color, fog);
-    */
 
     vec2 p = gl_PointCoord * 2.0 - 1.0;
     float r2 = dot(p, p);
@@ -39,7 +25,7 @@ void main()
         vColor * (0.3 + 0.7 * diffuse) +
         vec3(1.0) * spec * 0.25;
 
-    float fogDensity = 0.0003;  
+    float fogDensity = 0.0005;  
     float fog = exp(-fogDensity * vDepth);
     fog = clamp(fog, 0.0, 1.0);
     

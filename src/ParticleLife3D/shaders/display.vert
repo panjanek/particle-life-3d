@@ -37,10 +37,10 @@ void main()
     if (baseSize == 0)
         baseSize = 2.0;
 
-    gl_PointSize = baseSize/ clip.w;
+    gl_PointSize = baseSize / clip.w;
 
     if (points[id].flags == 1)
-        gl_PointSize = baseSize*2;
+        baseSize = baseSize*1.5;
 
     gl_PointSize = 10000 * baseSize / clip.w;
 
@@ -64,4 +64,6 @@ void main()
     if (points[id].flags == 2)
         vColor = vec3(0,0,0);
 
+    if (points[id].flags == 1)
+        vColor = vColor*1.25;
 }

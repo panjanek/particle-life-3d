@@ -23,7 +23,7 @@ namespace ParticleLife3D.Gpu
 {
     public class OpenGlRenderer
     {
-        public const double ZoomingSpeed = 0.0005;
+        public const double ZoomingSpeed = 0.3;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -85,8 +85,7 @@ namespace ParticleLife3D.Gpu
             displayProgram = new DisplayProgram();
             UploadParticleData();
 
-            cameraDistance = app.simulation.config.depth;
-            center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
+            ResetOrigin();
 
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
             {
@@ -99,10 +98,16 @@ namespace ParticleLife3D.Gpu
             glControl.MouseWheel += (s, e) =>
             {
                 StopTracking();
-                center.Z += (float)(e.Delta * 1);
+                center.Z += (float)(e.Delta * ZoomingSpeed);
             };
 
             glControl.MouseDown += GlControl_MouseDown;
+        }
+
+        public void ResetOrigin()
+        {
+            cameraDistance = app.simulation.config.depth;
+            center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
         }
 
         private void GlControl_MouseDown(object? sender, MouseEventArgs e)
