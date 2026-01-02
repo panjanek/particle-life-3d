@@ -20,12 +20,28 @@ uniform vec2 viewportSize;
 
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vDepth;
+layout(location = 2) out float vFadingAlpha;
+
+float fading_alpha(float r2)
+{
+    float sigma2 = 500*500;
+    float minAlpha = 0.5;
+
+    float a = exp(-(r2) / sigma2);
+    return max(a, minAlpha);
+}
 
 void main()
 {
     uint id = gl_VertexID;
 
     vec4 pos = points[id].position;
+    
+    float fading = 1.0;
+    if (pos.w > 0)
+        fading = fading_alpha(pos.w);
+    vFadingAlpha = fading;
+
     pos.w = 1.0;
     if (points[id].flags == 2)
         pos.w = 0;

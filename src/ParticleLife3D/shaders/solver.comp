@@ -193,9 +193,19 @@ void update_one(uint idx)
 
 void duplicate(Particle particle, uint nr, uint idx, vec4 traslation, int flags)
 {
-    displayParticles[idx + nr * config.particleCount] = particle;
-    displayParticles[idx + nr * config.particleCount].position += traslation;
-    displayParticles[idx + nr * config.particleCount].flags = flags;
+    uint duplIdx = idx + nr * config.particleCount;
+    Particle dupl = particle;
+    dupl.position += traslation;
+    dupl.flags = flags;
+    dupl.position.w = 0.0;
+    if (config.trackedIdx > -1)
+    {    
+        vec4 d = dupl.position - inParticles[config.trackedIdx].position;
+        float r2 = dot(d, d);
+        dupl.position.w = r2;
+    }
+
+    displayParticles[duplIdx] = dupl;
 }
 
 void main()

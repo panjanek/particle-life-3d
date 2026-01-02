@@ -2,6 +2,7 @@
 
 layout(location = 0) in vec3 vColor;
 layout(location = 1) in float vDepth;
+layout(location = 2) in float vFadingAlpha;
 
 out vec4 outputColor;
 
@@ -30,7 +31,6 @@ void main()
     fog = clamp(fog, 0.0, 1.0);
     
 
-    outputColor = vec4(color*fog, fog);
-    //outputColor = vec4(1,1,1, 1);
+    outputColor = vec4(color*fog*vFadingAlpha, fog*vFadingAlpha);
 
 }
