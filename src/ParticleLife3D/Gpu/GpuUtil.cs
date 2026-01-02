@@ -48,6 +48,7 @@ namespace ParticleLife3D.Gpu
             return worldH.Xy / worldH.W;
         }
 
+
         public static Vector4 Multiply(Matrix4 m, Vector4 v)
         {
             return new Vector4(

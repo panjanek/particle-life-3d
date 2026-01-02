@@ -98,26 +98,6 @@ namespace ParticleLife3D.Gpu
             glControl.MouseWheel += (s, e) =>
             {
                 center.Z += (float)(e.Delta * 1);
-                /*
-                var pos = new Vector2(e.X, e.Y);
-                float zoomRatio = (float)(1.0 + ZoomingSpeed * e.Delta);
-
-                var projectionMatrix = GetProjectionMatrix();
-                var topLeft1 = GpuUtil.ScreenToWorld(new Vector2(0, 0), projectionMatrix, glControl.Width, glControl.Height);
-                var bottomRight1 = GpuUtil.ScreenToWorld(new Vector2(glControl.Width, glControl.Height), projectionMatrix, glControl.Width, glControl.Height);
-                var zoomCenter = GpuUtil.ScreenToWorld(pos, projectionMatrix, glControl.Width, glControl.Height);
-
-                var currentSize = bottomRight1 - topLeft1;
-                var newSize = currentSize / (float)zoomRatio;
-
-                var c = zoomCenter - topLeft1;
-                var b = c / (float)zoomRatio;
-
-                var topLeft2 = zoomCenter - b;
-                var bottomRight2 = topLeft2 + newSize;
-
-                center = (bottomRight2 + topLeft2) / 2;
-                zoom = zoom * zoomRatio;*/
             };
 
             glControl.MouseDown += GlControl_MouseDown;
@@ -148,7 +128,8 @@ namespace ParticleLife3D.Gpu
                     for (int idx = 0; idx< app.simulation.particles.Length; idx++)
                     {
                         var particlePosition = app.simulation.particles[idx].position;
-                        var distance = Math.Sqrt((particlePosition.X - mouseWorld.X) * (particlePosition.X - mouseWorld.X) + (particlePosition.Y - mouseWorld.Y) * (particlePosition.Y - mouseWorld.Y));
+                        var distance = Math.Sqrt((particlePosition.X - mouseWorld.X) * (particlePosition.X - mouseWorld.X) + 
+                                                 (particlePosition.Y - mouseWorld.Y) * (particlePosition.Y - mouseWorld.Y));
                         if (distance < minDistance)
                         {
                             minDistance = distance;
