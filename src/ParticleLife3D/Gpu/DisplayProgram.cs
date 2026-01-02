@@ -37,19 +37,16 @@ namespace ParticleLife3D.Gpu
         public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize)
         {
             GL.Enable(EnableCap.ProgramPointSize);
-            //GL.Enable(EnableCap.Blend);
-            //GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
-            //GL.BlendEquation(OpenTK.Graphics.OpenGL.BlendEquationMode.FuncAdd);
-           // GL.Clear(ClearBufferMask.ColorBufferBit);
 
-
-            // --- DEPTH ---
+            // depth
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
-            GL.DepthMask(true); // allow depth writes
+            GL.DepthMask(true);
 
-            // --- NO BLENDING ---
-            GL.Disable(EnableCap.Blend);
+            // blending
+            //GL.Disable(EnableCap.Blend);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             // --- CLEAR BOTH ---
             GL.Clear(
@@ -58,7 +55,6 @@ namespace ParticleLife3D.Gpu
             );
 
 
-            GL.UseProgram(program);
             GL.BindVertexArray(dummyVao);
             GL.UseProgram(program);
             GL.UniformMatrix4(projLocation, false, ref projectionMatrix);

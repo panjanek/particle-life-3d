@@ -45,5 +45,6 @@ void main()
     
 
     outputColor = vec4(color*fog, fog);
+    //outputColor = vec4(1,1,1, 1);
 
 }

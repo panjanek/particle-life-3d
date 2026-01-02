@@ -41,7 +41,7 @@ namespace ParticleLife3D.Gpu
 
         private DisplayProgram displayProgram;
 
-        private float zoom = 0.5f;
+        private float cameraDistance = 2000f;
 
         private Vector4 center;
 
@@ -89,8 +89,7 @@ namespace ParticleLife3D.Gpu
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
             {
                 StopTracking();
-                var delta = (curr - prev) / zoom;
-                delta.Y = -delta.Y;
+                var delta = (curr - prev);
                 center -= new Vector4(delta.X, delta.Y, 0, 0);
 
             }, () => { });
@@ -185,7 +184,7 @@ namespace ParticleLife3D.Gpu
         private Matrix4 GetProjectionMatrix()
         {
             Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z + 2000),
+                new Vector3(center.X, center.Y, center.Z + cameraDistance),
                 new Vector3(center.X, center.Y, 0),
                 Vector3.UnitY
 );
@@ -198,53 +197,7 @@ namespace ParticleLife3D.Gpu
             );
 
             Matrix4 matrix = view * proj;
-
-
-
-            var debug = "";
-            debug += $"{matrix[0, 0]},{matrix[0, 1]},{matrix[0, 2]},{matrix[0, 3]}\n";
-            debug += $"{matrix[1, 0]},{matrix[1, 1]},{matrix[1, 2]},{matrix[1, 3]}\n";
-            debug += $"{matrix[2, 0]},{matrix[2, 1]},{matrix[2, 2]},{matrix[2, 3]}\n";
-            debug += $"{matrix[3, 0]},{matrix[3, 1]},{matrix[3, 2]},{matrix[3, 3]}\n";
-
-            Console.WriteLine(debug);
-
-            //matrix[0, 0] = 1.7f;
-            //matrix[2, 2] = -1;
-            //matrix[3, 2] = -2000;
-            //matrix[3, 3] = 2000;
-
-            debug = "";
-            debug += $"{matrix[0, 0]},{matrix[0, 1]},{matrix[0, 2]},{matrix[0, 3]}\n";
-            debug += $"{matrix[1, 0]},{matrix[1, 1]},{matrix[1, 2]},{matrix[1, 3]}\n";
-            debug += $"{matrix[2, 0]},{matrix[2, 1]},{matrix[2, 2]},{matrix[2, 3]}\n";
-            debug += $"{matrix[3, 0]},{matrix[3, 1]},{matrix[3, 2]},{matrix[3, 3]}\n";
-
-
-            Console.WriteLine(debug);
-
-
             return matrix;
-            
-            
-            /*
-            Matrix4 proj = BuildManualPerspective(
-                    60,
-                    glControl.Width / (float)glControl.Height,
-                    0.1f,
-                    5000f
-                );
-
-            Matrix4 view = BuildView();
-
-            // OpenGL convention: clip = proj * view * pos
-            Matrix4 matrix = proj * view;
-
-
-
-            return matrix;
-            */
-            
         }
 
         private void FollowTrackedParticle()
