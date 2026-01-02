@@ -126,9 +126,10 @@
                 <ComboBox Name="particlesCount" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
                     <ComboBoxItem>100</ComboBoxItem>
                     <ComboBoxItem>1000</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">2500</ComboBoxItem>
+                    <ComboBoxItem>2500</ComboBoxItem>
                     <ComboBoxItem>5000</ComboBoxItem>
-                    <ComboBoxItem>10000</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">10000</ComboBoxItem>
+                    <ComboBoxItem>50000</ComboBoxItem>
                     <ComboBoxItem>100000</ComboBoxItem>
                     <ComboBoxItem>1000000</ComboBoxItem>
                 </ComboBox>

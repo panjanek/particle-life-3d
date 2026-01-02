@@ -92,13 +92,13 @@ namespace ParticleLife3D.Gpu
             {
                 StopTracking();
                 var delta = (curr - prev);
-                delta.Y = -delta.Y;
-                center -= new Vector4(delta.X, delta.Y, 0, 0);
+                center += new Vector4(delta.X, delta.Y, 0, 0);
 
             }, () => { });
 
             glControl.MouseWheel += (s, e) =>
             {
+                StopTracking();
                 center.Z += (float)(e.Delta * 1);
             };
 
@@ -214,7 +214,7 @@ namespace ParticleLife3D.Gpu
                 var projectionMatrix = GetProjectionMatrix();
                 var tracked = computeProgram.GetTrackedParticle();
                 var trackedPosition = tracked.position;
-                trackedPosition.Z -= 200;
+                trackedPosition.Z -= 300;
                 var delta = trackedPosition - center;
                 
                 var move = delta * app.simulation.cameraFollowSpeed;

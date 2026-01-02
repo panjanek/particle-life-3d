@@ -21,7 +21,7 @@ namespace ParticleLife3D.Models
 
         public float cameraFollowSpeed = 0.05f;
 
-        public float particleSize = 2.0f;
+        public float particleSize = 0.7f;
 
         [JsonIgnore]
         public Particle[] particles;
