@@ -23,7 +23,7 @@ namespace ParticleLife3D.Gpu
 {
     public class OpenGlRenderer
     {
-        public const double ZoomingSpeed = 0.3;
+        public const float ZoomingSpeed = 0.1f;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -43,6 +43,10 @@ namespace ParticleLife3D.Gpu
         private DisplayProgram displayProgram;
 
         private Vector4 center;
+
+        private double xzAngle = 0;
+
+        private double yAngle = 0;
 
         private AppContext app;
 
@@ -80,7 +84,6 @@ namespace ParticleLife3D.Gpu
             computeProgram = new ComputeProgram();
             displayProgram = new DisplayProgram();
             UploadParticleData();
-
             ResetOrigin();
 
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
@@ -89,11 +92,16 @@ namespace ParticleLife3D.Gpu
                 if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ||
                     System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift))
                 {
+                    xzAngle += (delta.X) * 0.01;
+                    yAngle += (delta.Y) * 0.01;
+                    //yAngle = Math.Clamp(yAngle, -Math.PI*0.4, Math.PI * 0.4);
                 }
                 else
                 {
                     StopTracking();
                     center += new Vector4(delta.X, delta.Y, 0, 0);
+                    float dirX = (float)Math.Sin(xzAngle);
+                    float dirZ = (float)Math.Cos(xzAngle);
                 }
 
             }, () => { });
@@ -101,7 +109,11 @@ namespace ParticleLife3D.Gpu
             glControl.MouseWheel += (s, e) =>
             {
                 StopTracking();
-                center.Z += (float)(e.Delta * ZoomingSpeed);
+                //center.Z += (float)(e.Delta * ZoomingSpeed);
+                float dirX = (float)(Math.Cos(yAngle) * Math.Sin(xzAngle));
+                float dirY = (float)(Math.Sin(yAngle));
+                float dirZ = (float)(Math.Cos(yAngle) * Math.Cos(xzAngle));
+                center += new Vector4(dirX, dirY, dirZ, 0) * e.Delta * ZoomingSpeed;
             };
 
             glControl.MouseDown += GlControl_MouseDown;
@@ -111,12 +123,17 @@ namespace ParticleLife3D.Gpu
 
         private Matrix4 GetProjectionMatrix()
         {
-            float cx = 1;
+            //float dirX = 1;
+
+            float dirX = (float)(Math.Cos(yAngle) * Math.Sin(xzAngle));
+            float dirY = (float)(Math.Sin(yAngle));
+            float dirZ = (float)(Math.Cos(yAngle) * Math.Cos(xzAngle));
+
             Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z - cx),
                 new Vector3(center.X, center.Y, center.Z),
+                new Vector3(center.X + dirX, center.Y + dirY, center.Z + dirZ),
                 Vector3.UnitY
-);
+            );
 
             Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
                 MathHelper.DegreesToRadians(60f),
@@ -136,26 +153,20 @@ namespace ParticleLife3D.Gpu
                 var tracked = computeProgram.GetTrackedParticle();
                 var trackedPosition = tracked.position;
                 trackedPosition.Z -= app.simulation.followDistance;
+
                 var delta = trackedPosition - center;
 
                 var translate = delta * app.simulation.cameraFollowSpeed;
-
-                if (Math.Abs(delta.X) > 0.75 * app.simulation.config.width)
-                    translate.X = (float)Math.Sign(delta.X) * app.simulation.config.width;
-
-                if (Math.Abs(delta.Y) > 0.75 * app.simulation.config.height)
-                    translate.Y = (float)Math.Sign(delta.Y) * app.simulation.config.height;
-
-                if (Math.Abs(delta.Z) > 0.75 * app.simulation.config.depth)
-                    translate.Z = (float)Math.Sign(delta.Z) * app.simulation.config.depth;
-
                 center += translate;
+
             }
         }
 
         public void ResetOrigin()
         {
             center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
+            xzAngle = 0;
+            yAngle = 0;
         }
 
         private void GlControl_MouseDown(object? sender, MouseEventArgs e)
