@@ -28,6 +28,8 @@ namespace ParticleLife3D.Gpu
         public const float ForwardSpeed = 0.1f;
 
         public const float DirectionChangeSpeed = 0.01f;
+
+        public const int TorusRepeats = 1;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -116,9 +118,20 @@ namespace ParticleLife3D.Gpu
 
             glControl.MouseWheel += (s, e) =>
             {
-                //going forward/backward current camera direction
-                StopTracking();
-                center += GetCameraDirection() * e.Delta * ForwardSpeed;
+                var delta = e.Delta * ForwardSpeed;
+                if (TrackedIdx.HasValue)
+                {
+                    //change follow distance
+                    app.simulation.followDistance -= delta;
+                    if (app.simulation.followDistance < 10)
+                        app.simulation.followDistance = 10;
+                    app.configWindow.UpdateActiveControls();
+                    app.configWindow.UpdatePassiveControls();
+                }
+                else
+                {
+                    center += GetCameraDirection() * delta; //going forward/backward current camera direction
+                }
             };
 
             glControl.MouseDoubleClick += GlControl_MouseDoubleClick;
@@ -138,9 +151,9 @@ namespace ParticleLife3D.Gpu
 
                 for (int idx = 0; idx < app.simulation.particles.Length; idx++)
                 {
-                    for (int x = -2; x <= 2; x++)
-                        for (int y = -2; y <= 2; y++)
-                            for (int z = -2; z <= 2; z++)
+                    for (int x = -TorusRepeats*2; x <= TorusRepeats*2; x++)
+                        for (int y = -TorusRepeats*2; y <= TorusRepeats*2; y++)
+                            for (int z = -TorusRepeats*2; z <= TorusRepeats*2; z++)
                             {
                                 var particlePosition = app.simulation.particles[idx].position;
                                 particlePosition.X += x * app.simulation.config.width;
@@ -224,6 +237,7 @@ namespace ParticleLife3D.Gpu
 
         public void ResetOrigin()
         {
+            StopTracking();
             center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
             xzAngle = 0;
             yAngle = 0;
@@ -269,9 +283,9 @@ namespace ParticleLife3D.Gpu
                     FollowTrackedParticle();
 
                     List<Vector4> torusOffsets = new List<Vector4>();
-                    for (int tx = -1; tx <= 1; tx++)
-                        for (int ty = -1; ty <= 1; ty++)
-                            for (int tz = -1; tz <= 1; tz++)
+                    for (int tx = -TorusRepeats; tx <= TorusRepeats; tx++)
+                        for (int ty = -TorusRepeats; ty <= TorusRepeats; ty++)
+                            for (int tz = -TorusRepeats; tz <= TorusRepeats; tz++)
                             {
                                 var torusOffset = new Vector4(tx * app.simulation.config.width, ty * app.simulation.config.height, tz * app.simulation.config.depth, 0);
                                 torusOffsets.Add(torusOffset);
