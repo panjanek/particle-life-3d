@@ -88,11 +88,10 @@ namespace ParticleLife3D.Gpu
             UploadParticleData();
             ResetOrigin();
 
-            var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
+            var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => true, (prev, curr, btn) =>
             {
                 var delta = (curr - prev);
-                if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ||
-                    System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift))
+                if (btn == MouseButtons.Right)
                 {
                     // change camera angle
                     xzAngle += (delta.X) * DirectionChangeSpeed;
@@ -121,8 +120,54 @@ namespace ParticleLife3D.Gpu
             };
 
             glControl.MouseDown += GlControl_MouseDown;
+            glControl.MouseDoubleClick += GlControl_MouseDoubleClick;
             glControl.Paint += GlControl_Paint;
             glControl.SizeChanged += GlControl_SizeChanged;
+        }
+
+        private void GlControl_MouseDoubleClick(object? sender, MouseEventArgs e)
+        {
+            lock (app.simulation)
+            {
+                computeProgram.DownloadData(app.simulation.particles);
+                double minDistance = app.simulation.config.width * 10;
+                int closestIdx = 0;
+                var projectionMatrix = GetCombinedProjectionMatrix();
+
+
+                for (int idx = 0; idx < app.simulation.particles.Length; idx++)
+                {
+                    for (int x = -2; x <= 2; x++)
+                        for (int y = -2; y <= 2; y++)
+                            for (int z = -2; z <= 2; z++)
+                            {
+                                var particlePosition = app.simulation.particles[idx].position;
+                                particlePosition.X += x * app.simulation.config.width;
+                                particlePosition.Y += y * app.simulation.config.height;
+                                particlePosition.Z += z * app.simulation.config.depth;
+
+                                var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
+                                if (screen.HasValue)
+                                {
+                                    var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
+                                                                (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
+                                    if (distance < minDistance)
+                                    {
+                                        minDistance = distance;
+                                        closestIdx = idx;
+                                    }
+                                }
+                            }
+                }
+
+                if (minDistance < 10)
+                {
+                    if (TrackedIdx == closestIdx)
+                        StopTracking();
+                    else
+                        StartTracking(closestIdx);
+                }
+            }
         }
 
         private Vector4 GetCameraDirection()
@@ -197,50 +242,7 @@ namespace ParticleLife3D.Gpu
 
         private void GlControl_MouseDown(object? sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                lock(app.simulation)
-                {
-                    computeProgram.DownloadData(app.simulation.particles);
-                    double minDistance = app.simulation.config.width * 10;
-                    int closestIdx = 0;
-                    var projectionMatrix = GetCombinedProjectionMatrix();
 
-
-                    for (int idx = 0; idx< app.simulation.particles.Length; idx++)
-                    {
-                        for (int x = -2; x <= 2; x++)
-                            for (int y = -2; y <= 2; y++)
-                                for (int z = -2; z <= 2; z++)
-                                {
-                                    var particlePosition = app.simulation.particles[idx].position;
-                                    particlePosition.X += x * app.simulation.config.width;
-                                    particlePosition.Y += y * app.simulation.config.height;
-                                    particlePosition.Z += z * app.simulation.config.depth;
-
-                                    var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
-                                    if (screen.HasValue)
-                                    {
-                                        var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
-                                                                 (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
-                                        if (distance < minDistance)
-                                        {
-                                            minDistance = distance;
-                                            closestIdx = idx;
-                                        }
-                                    }
-                                }
-                    }
-
-                    if (minDistance < 10)
-                    {
-                        if (TrackedIdx == closestIdx)
-                            StopTracking();
-                        else
-                            StartTracking(closestIdx);
-                    }
-                }
-            }
         }
 
         public void UploadParticleData()
