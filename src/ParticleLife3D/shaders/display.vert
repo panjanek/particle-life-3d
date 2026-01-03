@@ -10,7 +10,7 @@ struct Particle
    int  _pad1;
 };
 
-layout(std430, binding = 3) buffer OutputBuffer {
+layout(std430, binding = 2) buffer OutputBuffer {
     Particle points[];
 };
 
@@ -18,6 +18,7 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform float paricleSize;
 uniform vec2 viewportSize;
+uniform vec4 torusOffset;
 
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vDepth;
@@ -42,6 +43,7 @@ void main()
 
     uint id = gl_InstanceID;
     Particle p = points[id];
+    p.position += torusOffset;
 
     //if tracking enabled - make everything around tracked particle fade away
     float fading = 1.0;

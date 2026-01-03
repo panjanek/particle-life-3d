@@ -21,6 +21,8 @@ namespace ParticleLife3D.Gpu
 
         private int viewLocation;
 
+        private int torusOffsetLocation;
+
         private int quadVao;
 
         private int quadVbo;
@@ -39,6 +41,8 @@ namespace ParticleLife3D.Gpu
             if (viewportSizeLocation == -1) throw new Exception("Uniform 'viewportSize' not found. Shader optimized it out?");
             viewLocation = GL.GetUniformLocation(program, "view");
             if (viewLocation == -1) throw new Exception("Uniform 'view' not found. Shader optimized it out?");
+            torusOffsetLocation = GL.GetUniformLocation(program, "torusOffset");
+            if (torusOffsetLocation == -1) throw new Exception("Uniform 'torusOffset' not found. Shader optimized it out?");
 
             float[] quad =
                 {
@@ -68,7 +72,7 @@ namespace ParticleLife3D.Gpu
             GL.BindVertexArray(0);
         }
 
-        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view)
+        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets)
         {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
@@ -86,21 +90,27 @@ namespace ParticleLife3D.Gpu
                     ClearBufferMask.DepthBufferBit
                 );
 
-            GL.UseProgram(program);
-            GL.BindVertexArray(quadVao);
 
-            GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
-            GL.Uniform1(particleSizeLocation, particleSize);
-            GL.Uniform2(viewportSizeLocation, viewportSize);
-            GL.UniformMatrix4(viewLocation, false, ref view);
+            foreach (var torusOffset in torusOffsets)
+            {
+                GL.UseProgram(program);
+                GL.BindVertexArray(quadVao);
 
-            GL.DrawElementsInstanced(
-                PrimitiveType.Triangles,
-                6,
-                DrawElementsType.UnsignedInt,
-                IntPtr.Zero,
-                particlesCount * 27
-            );
+                GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
+                GL.Uniform1(particleSizeLocation, particleSize);
+                GL.Uniform2(viewportSizeLocation, viewportSize);
+                GL.UniformMatrix4(viewLocation, false, ref view);
+                var offset = torusOffset;
+                GL.Uniform4(torusOffsetLocation, ref offset);
+
+                GL.DrawElementsInstanced(
+                    PrimitiveType.Triangles,
+                    6,
+                    DrawElementsType.UnsignedInt,
+                    IntPtr.Zero,
+                    particlesCount * 1
+                );
+            }
 
         }
     }

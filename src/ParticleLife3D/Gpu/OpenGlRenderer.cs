@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Xps;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
@@ -286,11 +288,23 @@ namespace ParticleLife3D.Gpu
                 lock (app.simulation)
                 {
                     FollowTrackedParticle();
-                    displayProgram.Run(GetProjectionMatrix(), 
-                                       app.simulation.config.particleCount, 
-                                       app.simulation.particleSize, 
-                                       new Vector2(glControl.Width, glControl.Height),
-                                       GetViewMatrix());
+
+                    List<Vector4> torusOffsets = new List<Vector4>();
+                    for (int tx = -1; tx <= 1; tx++)
+                        for (int ty = -1; ty <= 1; ty++)
+                            for (int tz = -1; tz <= 1; tz++)
+                            {
+                                var torusOffset = new Vector4(tx * app.simulation.config.width, ty * app.simulation.config.height, tz * app.simulation.config.depth, 0);
+                                torusOffsets.Add(torusOffset);
+                            }
+
+                    displayProgram.Run(GetProjectionMatrix(),
+                        app.simulation.config.particleCount,
+                        app.simulation.particleSize,
+                        new Vector2(glControl.Width, glControl.Height),
+                        GetViewMatrix(),
+                        torusOffsets);
+
                     glControl.SwapBuffers();
                     frameCounter++;
                 }

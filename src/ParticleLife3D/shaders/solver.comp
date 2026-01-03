@@ -217,19 +217,26 @@ void main()
         update_one(idx);
 
         Particle particle = outParticles[idx];
-        int flags = 0;
+        particle.flags = 0;
         if (config.trackedIdx > -1 && config.trackedIdx == idx)
         {
-            flags = 1;
+            particle.flags = 1;
             tracked = particle;
         }
 
         int spec = particle.species;
         bool isDisabled = config.disabled[spec / 4][spec % 4] != 0;
         if (isDisabled)
-            flags = 2;
+            particle.flags = 2;
+
+        
+        outParticles[idx] = particle;
+
+
  
-        duplicate(particle, 0, idx, vec4(0, 0, 0, 0), flags);
+        //duplicate(particle, 0, idx, vec4(0, 0, 0, 0), flags);
+
+        /*
         duplicate(particle, 1, idx, vec4(config.width, 0, 0, 0), flags);
         duplicate(particle, 2, idx, vec4(-config.width, 0, 0, 0), flags);
         duplicate(particle, 3, idx, vec4(0, config.height, 0, 0), flags);
@@ -258,5 +265,6 @@ void main()
         duplicate(particle, 24, idx, vec4(config.width, -config.height, config.depth, 0), flags);
         duplicate(particle, 25, idx, vec4(-config.width, config.height, config.depth, 0), flags);
         duplicate(particle, 26, idx, vec4(config.width, config.height, config.depth, 0), flags);
+        */
     }
 }
