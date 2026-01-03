@@ -27,7 +27,7 @@ namespace ParticleLife3D.Gpu
     {
         public const float ForwardSpeed = 0.1f;
 
-        public const float DirectionChangeSpeed = 0.01f;
+        public const float DirectionChangeSpeed = 0.003f;
 
         public const int TorusRepeats = 3;
         public int FrameCounter => frameCounter;
@@ -98,8 +98,8 @@ namespace ParticleLife3D.Gpu
                 if (btn == MouseButtons.Right)
                 {
                     // change camera angle
-                    xzAngle += (delta.X) * DirectionChangeSpeed;
-                    yAngle += (delta.Y) * DirectionChangeSpeed;
+                    xzAngle -= (delta.X) * DirectionChangeSpeed;
+                    yAngle -= (delta.Y) * DirectionChangeSpeed;
                     yAngle = Math.Clamp(yAngle, -Math.PI*0.48, Math.PI * 0.48);
                 }
                 else
@@ -140,6 +140,7 @@ namespace ParticleLife3D.Gpu
             glControl.MouseDoubleClick += GlControl_MouseDoubleClick;
             glControl.Paint += GlControl_Paint;
             glControl.SizeChanged += GlControl_SizeChanged;
+            GlControl_SizeChanged(this, null);
         }
 
         private void GlControl_MouseDoubleClick(object? sender, MouseEventArgs e)
@@ -282,23 +283,18 @@ namespace ParticleLife3D.Gpu
 
         private void GlControl_Paint(object? sender, PaintEventArgs e)
         {
-            lock (app.simulation)
-            {
-                FollowTrackedParticle();
-                var torusOffsets = GetVisibleTorusOffsets();
-                var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
-                displayProgram.Run(GetProjectionMatrix(),
-                    app.simulation.config.particleCount,
-                    app.simulation.particleSize,
-                    new Vector2(glControl.Width, glControl.Height),
-                    GetViewMatrix(),
-                    torusOffsets,
-                    trackedPos);
-
-                glControl.SwapBuffers();
-                frameCounter++;
-            }
-
+            FollowTrackedParticle();
+            var torusOffsets = GetVisibleTorusOffsets();
+            var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
+            displayProgram.Run(GetProjectionMatrix(),
+                app.simulation.config.particleCount,
+                app.simulation.particleSize,
+                new Vector2(glControl.Width, glControl.Height),
+                GetViewMatrix(),
+                torusOffsets,
+                trackedPos);
+            glControl.SwapBuffers();
+            frameCounter++;
             Capture();
         }
 
@@ -338,11 +334,8 @@ namespace ParticleLife3D.Gpu
             //compute
             if (!Paused)
             {
-                lock (app.simulation)
-                {
-                    app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                    computeProgram.Run(app.simulation.config, app.simulation.forces);
-                }
+                app.simulation.config.trackedIdx = TrackedIdx ?? -1;
+                computeProgram.Run(app.simulation.config, app.simulation.forces);
             }
 
             glControl.Invalidate();

@@ -75,10 +75,7 @@ namespace ParticleLife3D.Gpu
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
 
             GL.BindVertexArray(0);
-        }
 
-        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets, Vector4 trackedPos)
-        {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
             GL.DepthMask(true);
@@ -89,12 +86,15 @@ namespace ParticleLife3D.Gpu
                 BlendingFactor.OneMinusSrcAlpha
             );
 
+
+        }
+
+        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets, Vector4 trackedPos)
+        {
             GL.Clear(
-                    ClearBufferMask.ColorBufferBit |
-                    ClearBufferMask.DepthBufferBit
-                );
-
-
+                ClearBufferMask.ColorBufferBit |
+                ClearBufferMask.DepthBufferBit
+            );
             foreach (var torusOffset in torusOffsets)
             {
                 GL.UseProgram(program);

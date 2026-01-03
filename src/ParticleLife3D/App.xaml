@@ -4,6 +4,110 @@
              xmlns:local="clr-namespace:ParticleLife3D"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="{x:Static SystemColors.MenuBrushKey}" Color="White" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.MenuTextBrushKey}" Color="Black" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="White"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#FFF0F0F0"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF3399FF"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="4,2"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border
+                    Background="{TemplateBinding Background}"
+                    Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style TargetType="ComboBox">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Selected item area -->
+                            <Border
+                        Grid.Column="0"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="4">
+
+                                <ContentPresenter
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"/>
+                            </Border>
+
+                            <!-- Drop-down button -->
+                            <ToggleButton
+                        Grid.Column="1"
+                        IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                        Focusable="False"
+                        Background="#FFEFEFEF"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="0,1,1,1">
+
+                                <Path
+                            Data="M 0 0 L 4 4 L 8 0 Z"
+                            Fill="Black"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                            </ToggleButton>
+
+                            <!-- Popup -->
+                            <Popup
+    x:Name="Popup"
+    Placement="Bottom"
+    IsOpen="{TemplateBinding IsDropDownOpen}"
+    AllowsTransparency="False"
+    Focusable="False">
+
+                                <Border
+        Background="White"
+        BorderBrush="Gray"
+        BorderThickness="1">
+
+                                    <ScrollViewer
+            Background="White"
+            CanContentScroll="True">
+
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
     </Application.Resources>
 </Application>
