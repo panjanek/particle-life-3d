@@ -99,7 +99,12 @@ namespace ParticleLife3D.Gpu
                 else
                 {
                     StopTracking();
-                    center += new Vector4(delta.X, delta.Y, 0, 0);
+                    var forward = GetCameraDirection();
+                    forward.Normalize();
+                    Vector3 right = Vector3.Normalize(Vector3.Cross(forward.Xyz, Vector3.UnitY));
+                    Vector3 up = Vector3.Cross(right, forward.Xyz);
+                    var trranslation = -right * delta.X + up * delta.Y;
+                    center += new Vector4(trranslation.X, trranslation.Y, trranslation.Z, 0);
                 }
 
             }, () => { });
