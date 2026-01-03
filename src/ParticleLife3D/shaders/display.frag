@@ -14,13 +14,13 @@ uniform float paricleSize;
 
 void main()
 {
-    float sphereRadius = 20 * paricleSize;
+    float sphereRadius = 2 * paricleSize;
 
-    // Ray origin is camera at (0,0,0) in view space
+    // Ray origin is camera in view space
     vec3 rayOrigin = vec3(0.0);
 
-    // Ray direction through this fragment
-    vec3 rayDir = normalize(vec3(vQuad, -1.0));
+    // Ray direction goes from camera through the quad pixel
+    vec3 rayDir = normalize(vCenterView + vec3(vQuad * sphereRadius, 0.0));
 
     // Sphere center in view space
     vec3 oc = rayOrigin - vCenterView;

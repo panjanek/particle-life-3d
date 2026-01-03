@@ -38,7 +38,7 @@ float fading_alpha(float r2)
 void main()
 {
     
-    float sphereRadius = 20 * paricleSize + (viewportSize.x*0);
+    float sphereRadius = 2 * paricleSize + (viewportSize.x*0);
 
     uint id = gl_InstanceID;
     Particle p = points[id];
@@ -49,8 +49,14 @@ void main()
     vCenterView = viewPos.xyz;
     vQuad = quadPos;
 
-    // Expand quad in view space
-    vec3 offset = vec3(quadPos * sphereRadius, 0.0);
+    // Camera basis vectors from view matrix
+    vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
+    vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
+
+    vec3 offset =
+        camRight * quadPos.x * sphereRadius +
+        camUp    * quadPos.y * sphereRadius;
+
     vec4 pos = viewPos + vec4(offset, 0.0);
 
     gl_Position = projection * pos;

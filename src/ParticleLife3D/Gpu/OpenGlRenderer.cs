@@ -133,7 +133,7 @@ namespace ParticleLife3D.Gpu
             return new Vector4(dirX, dirY, dirZ, 0);
         }
 
-        private Matrix4 GetProjectionMatrix()
+        private Matrix4 GetCombinedProjectionMatrix()
         {
             Matrix4 view = Matrix4.LookAt(
                 center.Xyz,
@@ -150,6 +150,18 @@ namespace ParticleLife3D.Gpu
 
             Matrix4 matrix = view * proj;
             return matrix;
+        }
+
+        private Matrix4 GetProjectionMatrix()
+        {
+            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(60f),
+                glControl.Width / (float)glControl.Height,
+                0.1f,
+                5000f
+            );
+
+            return proj;
         }
 
         private Matrix4 GetViewMatrix()
@@ -192,7 +204,7 @@ namespace ParticleLife3D.Gpu
                     computeProgram.DownloadData(app.simulation.particles);
                     double minDistance = app.simulation.config.width * 10;
                     int closestIdx = 0;
-                    var projectionMatrix = GetProjectionMatrix();
+                    var projectionMatrix = GetCombinedProjectionMatrix();
 
 
                     for (int idx = 0; idx< app.simulation.particles.Length; idx++)
