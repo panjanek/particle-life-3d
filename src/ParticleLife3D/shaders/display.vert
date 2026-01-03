@@ -25,6 +25,7 @@ layout(location = 2) out float vFadingAlpha;
 layout(location = 3) out vec3 vCenterView;
 layout(location = 4) out vec2 vQuad;
 layout(location = 5) in vec2 quadPos;
+layout(location = 6) out vec3 vOffsetView;
 
 float fading_alpha(float r2)
 {
@@ -37,28 +38,23 @@ float fading_alpha(float r2)
 
 void main()
 {
-    
     float sphereRadius = 2 * paricleSize + (viewportSize.x*0);
 
     uint id = gl_InstanceID;
     Particle p = points[id];
 
-    vec4 worldPos = vec4(p.position.xyz, 1.0);
-    vec4 viewPos  = view * worldPos;
+    vec4 viewPos = view * vec4(p.position.xyz, 1.0);
 
     vCenterView = viewPos.xyz;
     vQuad = quadPos;
 
-    // Camera basis vectors from view matrix
-    vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
-    vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
+    // In VIEW SPACE the camera basis is fixed
+    float inflate = 1.5;
+    vec3 offset = vec3(quadPos * sphereRadius * inflate, 0.0);
 
-    vec3 offset =
-        camRight * quadPos.x * sphereRadius +
-        camUp    * quadPos.y * sphereRadius;
+    vOffsetView = offset;
 
     vec4 pos = viewPos + vec4(offset, 0.0);
-
     gl_Position = projection * pos;
 
     // species coloring as before

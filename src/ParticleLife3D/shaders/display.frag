@@ -5,6 +5,7 @@ layout(location = 1) in float vDepth;
 layout(location = 2) in float vFadingAlpha;
 layout(location = 3) in vec3 vCenterView;
 layout(location = 4) in vec2 vQuad;
+layout(location = 6) in vec3 vOffsetView;
 
 out vec4 outputColor;
 
@@ -19,10 +20,7 @@ void main()
     // Ray origin is camera in view space
     vec3 rayOrigin = vec3(0.0);
 
-    // Ray direction goes from camera through the quad pixel
-    vec3 rayDir = normalize(vCenterView + vec3(vQuad * sphereRadius, 0.0));
-
-    // Sphere center in view space
+    vec3 rayDir = normalize(vCenterView + vOffsetView);
     vec3 oc = rayOrigin - vCenterView;
 
     float b = dot(oc, rayDir);
