@@ -150,8 +150,6 @@ namespace ParticleLife3D.Gpu
                 double minDistance = app.simulation.config.width * 10;
                 int closestIdx = 0;
                 var projectionMatrix = GetCombinedProjectionMatrix();
-
-
                 for (int idx = 0; idx < app.simulation.particles.Length; idx++)
                 {
                     for (int x = -1; x <= 1; x++)
@@ -163,11 +161,13 @@ namespace ParticleLife3D.Gpu
                                 particlePosition.Y += y * app.simulation.config.height;
                                 particlePosition.Z += z * app.simulation.config.depth;
 
-                                var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
-                                if (screen.HasValue)
+                                //var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
+                                var screenAndDepth = GpuUtil.World3DToScreenWithDepth(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
+                                if (screenAndDepth.HasValue)
                                 {
-                                    var distance = Math.Sqrt((screen.Value.X - e.X) * (screen.Value.X - e.X) +
-                                                                (screen.Value.Y - e.Y) * (screen.Value.Y - e.Y));
+                                    var screen = screenAndDepth.Value.screen;
+                                    var distance = Math.Sqrt((screen.X - e.X) * (screen.X - e.X) +
+                                                                (screen.Y - e.Y) * (screen.Y - e.Y));
                                     if (distance < minDistance)
                                     {
                                         minDistance = distance;

@@ -88,5 +88,39 @@ namespace ParticleLife3D.Gpu
 
             return new Vector2(x, y);
         }
+
+        public static (Vector2 screen, float depth)? World3DToScreenWithDepth(
+            Vector3 position,
+            Matrix4 projection,
+            int viewportWidth,
+            int viewportHeight)
+        {
+            Vector4 p = new Vector4(position, 1.0f);
+
+            // row-vector multiply (correct for OpenTK)
+            Vector4 clip = Vector4.TransformRow(p, projection);
+
+            if (clip.W <= 0.0f)
+                return null;
+
+            Vector3 ndc = new Vector3(
+                clip.X / clip.W,
+                clip.Y / clip.W,
+                clip.Z / clip.W
+            );
+
+            // outside screen
+            if (ndc.X < -1 || ndc.X > 1 ||
+                ndc.Y < -1 || ndc.Y > 1 ||
+                ndc.Z < -1 || ndc.Z > 1)
+                return null;
+
+            float x = (ndc.X * 0.5f + 0.5f) * viewportWidth;
+            float y = viewportHeight - (ndc.Y * 0.5f + 0.5f) * viewportHeight;
+
+            float depth01 = ndc.Z * 0.5f + 0.5f;
+
+            return (new Vector2(x, y), depth01);
+        }
     }
 }
