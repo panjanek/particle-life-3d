@@ -94,14 +94,12 @@ namespace ParticleLife3D.Gpu
                 {
                     xzAngle += (delta.X) * 0.01;
                     yAngle += (delta.Y) * 0.01;
-                    //yAngle = Math.Clamp(yAngle, -Math.PI*0.4, Math.PI * 0.4);
+                    yAngle = Math.Clamp(yAngle, -Math.PI*0.4, Math.PI * 0.4);
                 }
                 else
                 {
                     StopTracking();
                     center += new Vector4(delta.X, delta.Y, 0, 0);
-                    float dirX = (float)Math.Sin(xzAngle);
-                    float dirZ = (float)Math.Cos(xzAngle);
                 }
 
             }, () => { });
@@ -109,11 +107,7 @@ namespace ParticleLife3D.Gpu
             glControl.MouseWheel += (s, e) =>
             {
                 StopTracking();
-                //center.Z += (float)(e.Delta * ZoomingSpeed);
-                float dirX = (float)(Math.Cos(yAngle) * Math.Sin(xzAngle));
-                float dirY = (float)(Math.Sin(yAngle));
-                float dirZ = (float)(Math.Cos(yAngle) * Math.Cos(xzAngle));
-                center += new Vector4(dirX, dirY, dirZ, 0) * e.Delta * ZoomingSpeed;
+                center += GetCameraDirection() * e.Delta * ZoomingSpeed;
             };
 
             glControl.MouseDown += GlControl_MouseDown;
@@ -121,17 +115,19 @@ namespace ParticleLife3D.Gpu
             glControl.SizeChanged += GlControl_SizeChanged;
         }
 
-        private Matrix4 GetProjectionMatrix()
+        private Vector4 GetCameraDirection()
         {
-            //float dirX = 1;
-
             float dirX = (float)(Math.Cos(yAngle) * Math.Sin(xzAngle));
             float dirY = (float)(Math.Sin(yAngle));
             float dirZ = (float)(Math.Cos(yAngle) * Math.Cos(xzAngle));
+            return new Vector4(dirX, dirY, dirZ, 0);
+        }
 
+        private Matrix4 GetProjectionMatrix()
+        {
             Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z),
-                new Vector3(center.X + dirX, center.Y + dirY, center.Z + dirZ),
+                center.Xyz,
+                (center+GetCameraDirection()).Xyz,
                 Vector3.UnitY
             );
 
@@ -152,10 +148,8 @@ namespace ParticleLife3D.Gpu
             {
                 var tracked = computeProgram.GetTrackedParticle();
                 var trackedPosition = tracked.position;
-                trackedPosition.Z -= app.simulation.followDistance;
-
+                trackedPosition -= GetCameraDirection() * app.simulation.followDistance; 
                 var delta = trackedPosition - center;
-
                 var translate = delta * app.simulation.cameraFollowSpeed;
                 center += translate;
 
