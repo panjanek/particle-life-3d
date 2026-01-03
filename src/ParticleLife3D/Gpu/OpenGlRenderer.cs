@@ -121,7 +121,6 @@ namespace ParticleLife3D.Gpu
                 center += GetCameraDirection() * e.Delta * ForwardSpeed;
             };
 
-            glControl.MouseDown += GlControl_MouseDown;
             glControl.MouseDoubleClick += GlControl_MouseDoubleClick;
             glControl.Paint += GlControl_Paint;
             glControl.SizeChanged += GlControl_SizeChanged;
@@ -240,11 +239,6 @@ namespace ParticleLife3D.Gpu
             center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
             xzAngle = 0;
             yAngle = 0;
-        }
-
-        private void GlControl_MouseDown(object? sender, MouseEventArgs e)
-        {
-
         }
 
         public void UploadParticleData()

@@ -25,8 +25,6 @@ namespace ParticleLife3D.Gpu
 
         private int pointsBufferB;
 
-        private int pointsTorusBuffer;
-
         private int trackingBuffer;
 
         private int pointsCount;
@@ -74,7 +72,6 @@ namespace ParticleLife3D.Gpu
             //bind storage buffers
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
-            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, pointsTorusBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
 
@@ -151,16 +148,6 @@ namespace ParticleLife3D.Gpu
                 GL.GenBuffers(1, out pointsBufferB);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferB);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
-
-                //torus buffer
-                if (pointsTorusBuffer > 0)
-                {
-                    GL.DeleteBuffer(pointsTorusBuffer);
-                    pointsTorusBuffer = 0;
-                }
-                GL.GenBuffers(1, out pointsTorusBuffer);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsTorusBuffer);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, 27 * pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
              }
         }
     }

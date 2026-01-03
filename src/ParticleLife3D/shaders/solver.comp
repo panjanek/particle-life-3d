@@ -50,11 +50,6 @@ layout(std430, binding = 2) writeonly buffer OutputBuffer
     Particle outParticles[];
 };
 
-layout(std430, binding = 3) writeonly buffer VertexBuffer
-{
-    Particle displayParticles[];
-};
-
 layout(std430, binding = 4) readonly buffer ForceBuffer {
     vec4 forces[];
 };
@@ -191,23 +186,6 @@ void update_one(uint idx)
     outParticles[idx].velocity = vel;
 }
 
-void duplicate(Particle particle, uint nr, uint idx, vec4 traslation, int flags)
-{
-    uint duplIdx = idx + nr * config.particleCount;
-    Particle dupl = particle;
-    dupl.position += traslation;
-    dupl.flags = flags;
-    dupl.position.w = 0.0;
-    if (config.trackedIdx > -1)
-    {    
-        vec4 d = dupl.position - inParticles[config.trackedIdx].position;
-        float r2 = dot(d, d);
-        dupl.position.w = r2;
-    }
-
-    displayParticles[duplIdx] = dupl;
-}
-
 void main()
 {
     uint idx = gl_GlobalInvocationID.x;
@@ -229,42 +207,6 @@ void main()
         if (isDisabled)
             particle.flags = 2;
 
-        
         outParticles[idx] = particle;
-
-
- 
-        //duplicate(particle, 0, idx, vec4(0, 0, 0, 0), flags);
-
-        /*
-        duplicate(particle, 1, idx, vec4(config.width, 0, 0, 0), flags);
-        duplicate(particle, 2, idx, vec4(-config.width, 0, 0, 0), flags);
-        duplicate(particle, 3, idx, vec4(0, config.height, 0, 0), flags);
-        duplicate(particle, 4, idx, vec4(0, -config.height, 0, 0), flags);
-        duplicate(particle, 5, idx, vec4(-config.width, -config.height, 0, 0), flags);
-        duplicate(particle, 6, idx, vec4(config.width, -config.height, 0, 0), flags);
-        duplicate(particle, 7, idx, vec4(-config.width, config.height, 0, 0), flags);
-        duplicate(particle, 8, idx, vec4(config.width, config.height, 0, 0), flags);
-
-        duplicate(particle, 9, idx, vec4(0, 0, -config.depth, 0), flags);
-        duplicate(particle, 10, idx, vec4(config.width, 0, -config.depth, 0), flags);
-        duplicate(particle, 11, idx, vec4(-config.width, 0, -config.depth, 0), flags);
-        duplicate(particle, 12, idx, vec4(0, config.height, -config.depth, 0), flags);
-        duplicate(particle, 13, idx, vec4(0, -config.height, -config.depth, 0), flags);
-        duplicate(particle, 14, idx, vec4(-config.width, -config.height, -config.depth, 0), flags);
-        duplicate(particle, 15, idx, vec4(config.width, -config.height, -config.depth, 0), flags);
-        duplicate(particle, 16, idx, vec4(-config.width, config.height, -config.depth, 0), flags);
-        duplicate(particle, 17, idx, vec4(config.width, config.height, -config.depth, 0), flags);
-
-        duplicate(particle, 18, idx, vec4(0, 0, config.depth, 0), flags);
-        duplicate(particle, 19, idx, vec4(config.width, 0, config.depth, 0), flags);
-        duplicate(particle, 20, idx, vec4(-config.width, 0, config.depth, 0), flags);
-        duplicate(particle, 21, idx, vec4(0, config.height, config.depth, 0), flags);
-        duplicate(particle, 22, idx, vec4(0, -config.height, config.depth, 0), flags);
-        duplicate(particle, 23, idx, vec4(-config.width, -config.height, config.depth, 0), flags);
-        duplicate(particle, 24, idx, vec4(config.width, -config.height, config.depth, 0), flags);
-        duplicate(particle, 25, idx, vec4(-config.width, config.height, config.depth, 0), flags);
-        duplicate(particle, 26, idx, vec4(config.width, config.height, config.depth, 0), flags);
-        */
     }
 }
