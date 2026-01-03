@@ -19,6 +19,7 @@ uniform mat4 projection;
 uniform float paricleSize;
 uniform vec2 viewportSize;
 uniform vec4 torusOffset;
+uniform vec4 trackedPos;
 
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vDepth;
@@ -32,7 +33,6 @@ float fading_alpha(float r2)
 {
     float sigma2 = 500*500;
     float minAlpha = 0.5;
-
     float a = exp(-(r2) / sigma2);
     return max(a, minAlpha);
 }
@@ -40,21 +40,25 @@ float fading_alpha(float r2)
 void main()
 {
     float sphereRadius = 2 * paricleSize + (viewportSize.x/1920);
-
     uint id = gl_InstanceID;
     Particle p = points[id];
     p.position += torusOffset;
 
     //if tracking enabled - make everything around tracked particle fade away
-    float fading = 1.0;
-    if (p.position.w > 0)
-        fading = fading_alpha(p.position.w);
-    vFadingAlpha = fading;
+    vFadingAlpha = 1.0;
+    if (trackedPos.x > -100000)
+    {
+        vec4 d = p.position - trackedPos;
+        float r2 = dot(d, d);
+        vFadingAlpha = fading_alpha(r2);
+    }
+
+    //hide particles with this flag
     if (p.flags == 2)
         vFadingAlpha = 0;
 
+    //real spheres
     vec4 viewPos = view * vec4(p.position.xyz, 1.0);
-
     vCenterView = viewPos.xyz;
     vQuad = quadPos;
 

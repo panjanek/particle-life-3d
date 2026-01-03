@@ -23,6 +23,8 @@ namespace ParticleLife3D.Gpu
 
         private int torusOffsetLocation;
 
+        private int trackedPosLocation;
+
         private int quadVao;
 
         private int quadVbo;
@@ -43,6 +45,8 @@ namespace ParticleLife3D.Gpu
             if (viewLocation == -1) throw new Exception("Uniform 'view' not found. Shader optimized it out?");
             torusOffsetLocation = GL.GetUniformLocation(program, "torusOffset");
             if (torusOffsetLocation == -1) throw new Exception("Uniform 'torusOffset' not found. Shader optimized it out?");
+            trackedPosLocation = GL.GetUniformLocation(program, "trackedPos");
+            if (trackedPosLocation == -1) throw new Exception("Uniform 'trackedPos' not found. Shader optimized it out?");
 
             float[] quad =
                 {
@@ -72,7 +76,7 @@ namespace ParticleLife3D.Gpu
             GL.BindVertexArray(0);
         }
 
-        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets)
+        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets, Vector4 trackedPos)
         {
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
@@ -102,6 +106,7 @@ namespace ParticleLife3D.Gpu
                 GL.UniformMatrix4(viewLocation, false, ref view);
                 var offset = torusOffset;
                 GL.Uniform4(torusOffsetLocation, ref offset);
+                GL.Uniform4(trackedPosLocation, ref trackedPos);
 
                 GL.DrawElementsInstanced(
                     PrimitiveType.Triangles,

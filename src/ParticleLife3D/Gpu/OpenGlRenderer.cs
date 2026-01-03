@@ -181,19 +181,8 @@ namespace ParticleLife3D.Gpu
 
         private Matrix4 GetCombinedProjectionMatrix()
         {
-            Matrix4 view = Matrix4.LookAt(
-                center.Xyz,
-                (center+GetCameraDirection()).Xyz,
-                Vector3.UnitY
-            );
-
-            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(60f),
-                glControl.Width / (float)glControl.Height,
-                0.1f,
-                5000f
-            );
-
+            var view = GetViewMatrix();
+            var proj = GetProjectionMatrix();
             Matrix4 matrix = view * proj;
             return matrix;
         }
@@ -230,7 +219,6 @@ namespace ParticleLife3D.Gpu
                 var delta = cameraPosition - center;
                 var translate = delta * app.simulation.cameraFollowSpeed;
                 center += translate;
-
             }
         }
 
@@ -241,11 +229,8 @@ namespace ParticleLife3D.Gpu
             yAngle = 0;
         }
 
-        public void UploadParticleData()
-        {
-            computeProgram.UploadData(app.simulation.particles);
-        }
-
+        public void UploadParticleData() => computeProgram.UploadData(app.simulation.particles);
+     
         public void StartTracking(int idx)
         {
             TrackedIdx = idx;
@@ -292,12 +277,14 @@ namespace ParticleLife3D.Gpu
                                 torusOffsets.Add(torusOffset);
                             }
 
+                    var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
                     displayProgram.Run(GetProjectionMatrix(),
                         app.simulation.config.particleCount,
                         app.simulation.particleSize,
                         new Vector2(glControl.Width, glControl.Height),
                         GetViewMatrix(),
-                        torusOffsets);
+                        torusOffsets,
+                        trackedPos);
 
                     glControl.SwapBuffers();
                     frameCounter++;

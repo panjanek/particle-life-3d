@@ -189,7 +189,6 @@ void update_one(uint idx)
 void main()
 {
     uint idx = gl_GlobalInvocationID.x;
-
     if (idx >=0 && idx < config.particleCount) 
     {
         update_one(idx);
