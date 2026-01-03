@@ -45,5 +45,11 @@ void main()
     float ndcDepth = clip.z / clip.w;
     gl_FragDepth = ndcDepth * 0.5 + 0.5;
 
-    outputColor = vec4(color, 1.0);
+    // fog
+    float depth = -hit.z;
+    float fogDensity = 0.0005;
+    float fog = exp(-fogDensity * depth);
+    fog = clamp(fog, 0.0, 1.0);
+
+    outputColor = vec4(color*fog*vFadingAlpha, fog*vFadingAlpha);
 }

@@ -70,14 +70,17 @@ namespace ParticleLife3D.Gpu
 
         public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view)
         {
-            //GL.Enable(EnableCap.ProgramPointSize);
-
-            // depth
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
             GL.DepthMask(true);
 
-            GL.Disable(EnableCap.Blend);
+            //GL.Disable(EnableCap.Blend);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(
+                BlendingFactor.SrcAlpha,
+                BlendingFactor.OneMinusSrcAlpha
+            );
+
             GL.Clear(
                     ClearBufferMask.ColorBufferBit |
                     ClearBufferMask.DepthBufferBit

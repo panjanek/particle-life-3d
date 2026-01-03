@@ -228,7 +228,7 @@ void main()
         bool isDisabled = config.disabled[spec / 4][spec % 4] != 0;
         if (isDisabled)
             flags = 2;
-        
+ 
         duplicate(particle, 0, idx, vec4(0, 0, 0, 0), flags);
         duplicate(particle, 1, idx, vec4(config.width, 0, 0, 0), flags);
         duplicate(particle, 2, idx, vec4(-config.width, 0, 0, 0), flags);

@@ -38,10 +38,18 @@ float fading_alpha(float r2)
 
 void main()
 {
-    float sphereRadius = 2 * paricleSize + (viewportSize.x*0);
+    float sphereRadius = 2 * paricleSize + (viewportSize.x/1920);
 
     uint id = gl_InstanceID;
     Particle p = points[id];
+
+    //if tracking enabled - make everything around tracked particle fade away
+    float fading = 1.0;
+    if (p.position.w > 0)
+        fading = fading_alpha(p.position.w);
+    vFadingAlpha = fading;
+    if (p.flags == 2)
+        vFadingAlpha = 0;
 
     vec4 viewPos = view * vec4(p.position.xyz, 1.0);
 
@@ -70,4 +78,7 @@ void main()
     );
 
     vColor = colors[p.species % 8];
+
+    if (p.flags == 1)
+        vColor = vColor*2;
 }
