@@ -29,7 +29,7 @@ namespace ParticleLife3D.Gpu
 
         public const float DirectionChangeSpeed = 0.01f;
 
-        public const int TorusRepeats = 1;
+        public const int TorusRepeats = 3;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -92,7 +92,7 @@ namespace ParticleLife3D.Gpu
             UploadParticleData();
             ResetOrigin();
 
-            var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => true, (prev, curr, btn) =>
+            var dragging = new DraggingHandler(glControl, (mousePos, btn) => true, (prev, curr, btn) =>
             {
                 var delta = (curr - prev);
                 if (btn == MouseButtons.Right)
@@ -112,6 +112,7 @@ namespace ParticleLife3D.Gpu
                     Vector3 up = Vector3.Cross(right, forward.Xyz);
                     var trranslation = -right * delta.X + up * delta.Y;
                     center += new Vector4(trranslation.X, trranslation.Y, trranslation.Z, 0);
+                    center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
                 }
 
             }, () => { });
@@ -130,7 +131,9 @@ namespace ParticleLife3D.Gpu
                 }
                 else
                 {
-                    center += GetCameraDirection() * delta; //going forward/backward current camera direction
+                    //going forward/backward current camera direction
+                    center += GetCameraDirection() * delta;
+                    center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
                 }
             };
 
@@ -232,6 +235,7 @@ namespace ParticleLife3D.Gpu
                 var delta = cameraPosition - center;
                 var translate = delta * app.simulation.cameraFollowSpeed;
                 center += translate;
+                //center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
             }
         }
 

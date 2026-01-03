@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Mathematics;
 
 namespace ParticleLife3D.Utils
 {
@@ -27,6 +28,20 @@ namespace ParticleLife3D.Utils
 
             return 1 - a;
 
+        }
+
+        public static float TorusCorrection(float x, float size)
+        {
+            if (x < 0)
+                x += size;
+            else if (x > size)
+                x -= size;
+            return x;
+        }
+
+        public static Vector4 TorusCorrection(Vector4 pos, float width, float height, float depth)
+        {
+            return new Vector4(TorusCorrection(pos.X, width), TorusCorrection(pos.Y, height), TorusCorrection(pos.Z, depth), pos.W);
         }
     }
 }
