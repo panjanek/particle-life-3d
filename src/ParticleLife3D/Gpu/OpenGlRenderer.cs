@@ -23,7 +23,9 @@ namespace ParticleLife3D.Gpu
 {
     public class OpenGlRenderer
     {
-        public const float ZoomingSpeed = 0.1f;
+        public const float ForwardSpeed = 0.1f;
+
+        public const float DirectionChangeSpeed = 0.01f;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -92,12 +94,14 @@ namespace ParticleLife3D.Gpu
                 if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ||
                     System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift))
                 {
-                    xzAngle += (delta.X) * 0.01;
-                    yAngle += (delta.Y) * 0.01;
-                    yAngle = Math.Clamp(yAngle, -Math.PI*0.4, Math.PI * 0.4);
+                    // change camera angle
+                    xzAngle += (delta.X) * DirectionChangeSpeed;
+                    yAngle += (delta.Y) * DirectionChangeSpeed;
+                    yAngle = Math.Clamp(yAngle, -Math.PI*0.48, Math.PI * 0.48);
                 }
                 else
                 {
+                    // translating camera in a plane perpendicular to the current cammera direction
                     StopTracking();
                     var forward = GetCameraDirection();
                     forward.Normalize();
@@ -111,8 +115,9 @@ namespace ParticleLife3D.Gpu
 
             glControl.MouseWheel += (s, e) =>
             {
+                //going forward/backward current camera direction
                 StopTracking();
-                center += GetCameraDirection() * e.Delta * ZoomingSpeed;
+                center += GetCameraDirection() * e.Delta * ForwardSpeed;
             };
 
             glControl.MouseDown += GlControl_MouseDown;
@@ -152,9 +157,8 @@ namespace ParticleLife3D.Gpu
             if (TrackedIdx.HasValue)
             {
                 var tracked = computeProgram.GetTrackedParticle();
-                var trackedPosition = tracked.position;
-                trackedPosition -= GetCameraDirection() * app.simulation.followDistance; 
-                var delta = trackedPosition - center;
+                var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera back of tracked particle
+                var delta = cameraPosition - center;
                 var translate = delta * app.simulation.cameraFollowSpeed;
                 center += translate;
 
