@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
+using ParticleLife3D.Utils;
 
 namespace ParticleLife3D.Gpu
 {
@@ -82,7 +83,6 @@ namespace ParticleLife3D.Gpu
             GL.DepthFunc(DepthFunction.Less);
             GL.DepthMask(true);
 
-            //GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(
                 BlendingFactor.SrcAlpha,
@@ -116,7 +116,6 @@ namespace ParticleLife3D.Gpu
                     particlesCount * 1
                 );
             }
-
         }
     }
 }

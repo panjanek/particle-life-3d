@@ -55,7 +55,10 @@ void main()
 
     //hide particles with this flag
     if (p.flags == 2)
+    {
         vFadingAlpha = 0;
+        p.position.z = 1000000;
+    }
 
     //real spheres
     vec4 viewPos = view * vec4(p.position.xyz, 1.0);

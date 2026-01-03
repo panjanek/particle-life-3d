@@ -147,8 +147,9 @@ namespace ParticleLife3D.Gpu
             lock (app.simulation)
             {
                 computeProgram.DownloadData(app.simulation.particles);
-                double minDistance = app.simulation.config.width * 10;
-                int closestIdx = 0;
+                int pixelRadius = 5;
+                int? selectedIdx = null;
+                float minDepth = app.simulation.config.depth * 10;
                 var projectionMatrix = GetCombinedProjectionMatrix();
                 for (int idx = 0; idx < app.simulation.particles.Length; idx++)
                 {
@@ -161,28 +162,29 @@ namespace ParticleLife3D.Gpu
                                 particlePosition.Y += y * app.simulation.config.height;
                                 particlePosition.Z += z * app.simulation.config.depth;
 
-                                //var screen = GpuUtil.World3DToScreen(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
                                 var screenAndDepth = GpuUtil.World3DToScreenWithDepth(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
                                 if (screenAndDepth.HasValue)
                                 {
                                     var screen = screenAndDepth.Value.screen;
+                                    var depth = screenAndDepth.Value.depth;
                                     var distance = Math.Sqrt((screen.X - e.X) * (screen.X - e.X) +
-                                                                (screen.Y - e.Y) * (screen.Y - e.Y));
-                                    if (distance < minDistance)
+                                                             (screen.Y - e.Y) * (screen.Y - e.Y));
+                                    if (distance < pixelRadius && depth < minDepth)
                                     {
-                                        minDistance = distance;
-                                        closestIdx = idx;
+                                        selectedIdx = idx;
+                                        minDepth = depth;
                                     }
+                                   
                                 }
                             }
                 }
 
-                if (minDistance < 10)
+                if (selectedIdx.HasValue)
                 {
-                    if (TrackedIdx == closestIdx)
+                    if (TrackedIdx == selectedIdx.Value)
                         StopTracking();
                     else
-                        StartTracking(closestIdx);
+                        StartTracking(selectedIdx.Value);
                 }
             }
         }
@@ -280,31 +282,24 @@ namespace ParticleLife3D.Gpu
 
         private void GlControl_Paint(object? sender, PaintEventArgs e)
         {
-            try
+            lock (app.simulation)
             {
-                lock (app.simulation)
-                {
-                    FollowTrackedParticle();
-                    var torusOffsets = GetVisibleTorusOffsets();
-                    var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
-                    displayProgram.Run(GetProjectionMatrix(),
-                        app.simulation.config.particleCount,
-                        app.simulation.particleSize,
-                        new Vector2(glControl.Width, glControl.Height),
-                        GetViewMatrix(),
-                        torusOffsets,
-                        trackedPos);
+                FollowTrackedParticle();
+                var torusOffsets = GetVisibleTorusOffsets();
+                var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
+                displayProgram.Run(GetProjectionMatrix(),
+                    app.simulation.config.particleCount,
+                    app.simulation.particleSize,
+                    new Vector2(glControl.Width, glControl.Height),
+                    GetViewMatrix(),
+                    torusOffsets,
+                    trackedPos);
 
-                    glControl.SwapBuffers();
-                    frameCounter++;
-                }
+                glControl.SwapBuffers();
+                frameCounter++;
+            }
 
-                Capture();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            Capture();
         }
 
         private List<Vector4> GetVisibleTorusOffsets()

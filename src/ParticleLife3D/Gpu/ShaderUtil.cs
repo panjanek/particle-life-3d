@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic.Logging;
 using OpenTK.Graphics.OpenGL;
+using ParticleLife3D.Utils;
 
 namespace ParticleLife3D.Gpu
 {
@@ -25,6 +27,7 @@ namespace ParticleLife3D.Gpu
             if (status != (int)All.True)
             {
                 var log = GL.GetShaderInfoLog(computeShader);
+                DebugUtil.Log(log);
                 throw new Exception(log);
             }
 
@@ -34,6 +37,7 @@ namespace ParticleLife3D.Gpu
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out status);
             if (status != (int)All.True)
             {
+                DebugUtil.Log(GL.GetProgramInfoLog(program));
                 throw new Exception(GL.GetProgramInfoLog(program));
             }
 

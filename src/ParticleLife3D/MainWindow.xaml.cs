@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using ParticleLife3D.Gpu;
 using ParticleLife3D.Gui;
 using ParticleLife3D.Models;
+using ParticleLife3D.Utils;
 using AppContext = ParticleLife3D.Models.AppContext;
 using Application = System.Windows.Application;
 
@@ -38,22 +39,29 @@ namespace ParticleLife3D
 
         private void parent_Loaded(object sender, RoutedEventArgs e)
         {
-            app = new AppContext();
-            app.mainWindow = this;
-            app.simulation = new Simulation();
-            app.simulation.StartSimulation(5000, 8, 720, 405, 405);
-            app.renderer = new OpenGlRenderer(placeholder, app);
-            app.configWindow = new ConfigWindow(app);
-            app.configWindow.Show();
-            app.configWindow.Activate();
+            try
+            {
+                app = new AppContext();
+                app.mainWindow = this;
+                app.simulation = new Simulation();
+                app.simulation.StartSimulation(5000, 8, 720, 405, 405);
+                app.renderer = new OpenGlRenderer(placeholder, app);
+                app.configWindow = new ConfigWindow(app);
+                app.configWindow.Show();
+                app.configWindow.Activate();
 
-            KeyDown += MainWindow_KeyDown;
-            System.Timers.Timer systemTimer = new System.Timers.Timer() { Interval = 10 };
-            systemTimer.Elapsed += SystemTimer_Elapsed;
-            systemTimer.Start();
-            DispatcherTimer infoTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(1.0) };
-            infoTimer.Tick += InfoTimer_Tick;
-            infoTimer.Start();
+                KeyDown += MainWindow_KeyDown;
+                System.Timers.Timer systemTimer = new System.Timers.Timer() { Interval = 10 };
+                systemTimer.Elapsed += SystemTimer_Elapsed;
+                systemTimer.Start();
+                DispatcherTimer infoTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(1.0) };
+                infoTimer.Tick += InfoTimer_Tick;
+                infoTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                DebugUtil.Log($"Exception {ex.GetType().FullName}, {ex.Message}, {ex.StackTrace}");
+            }
         }
         public void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {

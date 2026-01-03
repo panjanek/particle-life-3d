@@ -116,7 +116,6 @@ float evaluateForceForOffset(uint offset, float dist)
     return 0.0;
 }
 
-
 void update_one(uint idx)
 {
     vec4 pos = inParticles[idx].position;
@@ -182,8 +181,24 @@ void update_one(uint idx)
     pos += vel * config.dt;
 
     torus_pos(pos);
-    outParticles[idx].position = pos;
-    outParticles[idx].velocity = vel;
+
+    //prepare updated particle struct
+    Particle updated;
+    updated.position = pos;
+    updated.velocity = vel;
+    updated.species = spec;
+    updated.flags = 0;
+    if (config.trackedIdx > -1 && config.trackedIdx == idx)
+    {
+        updated.flags = 1;
+        tracked = updated;
+    }
+
+    bool isDisabled = config.disabled[spec / 4][spec % 4] != 0;
+    if (isDisabled)
+        updated.flags = 2;
+
+    outParticles[idx] = updated;
 }
 
 void main()
@@ -192,20 +207,5 @@ void main()
     if (idx >=0 && idx < config.particleCount) 
     {
         update_one(idx);
-
-        Particle particle = outParticles[idx];
-        particle.flags = 0;
-        if (config.trackedIdx > -1 && config.trackedIdx == idx)
-        {
-            particle.flags = 1;
-            tracked = particle;
-        }
-
-        int spec = particle.species;
-        bool isDisabled = config.disabled[spec / 4][spec % 4] != 0;
-        if (isDisabled)
-            particle.flags = 2;
-
-        outParticles[idx] = particle;
     }
 }
