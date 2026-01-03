@@ -42,8 +42,6 @@ namespace ParticleLife3D.Gpu
 
         private DisplayProgram displayProgram;
 
-        private float cameraDistance = 2000f;
-
         private Vector4 center;
 
         private AppContext app;
@@ -72,7 +70,6 @@ namespace ParticleLife3D.Gpu
             host.Child = glControl;
             placeholder.Children.Add(host);
 
-
             //setup required features
             GL.Enable(EnableCap.ProgramPointSize);
             GL.Enable(EnableCap.Blend);
@@ -88,9 +85,16 @@ namespace ParticleLife3D.Gpu
 
             var dragging = new DraggingHandler(glControl, (mousePos, isLeft) => isLeft, (prev, curr) =>
             {
-                StopTracking();
                 var delta = (curr - prev);
-                center += new Vector4(delta.X, delta.Y, 0, 0);
+                if (System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) ||
+                    System.Windows.Input.Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift))
+                {
+                }
+                else
+                {
+                    StopTracking();
+                    center += new Vector4(delta.X, delta.Y, 0, 0);
+                }
 
             }, () => { });
 
@@ -105,9 +109,52 @@ namespace ParticleLife3D.Gpu
             glControl.SizeChanged += GlControl_SizeChanged;
         }
 
+        private Matrix4 GetProjectionMatrix()
+        {
+            float cx = 1;
+            Matrix4 view = Matrix4.LookAt(
+                new Vector3(center.X, center.Y, center.Z - cx),
+                new Vector3(center.X, center.Y, center.Z),
+                Vector3.UnitY
+);
+
+            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(60f),
+                glControl.Width / (float)glControl.Height,
+                0.1f,
+                5000f
+            );
+
+            Matrix4 matrix = view * proj;
+            return matrix;
+        }
+
+        private void FollowTrackedParticle()
+        {
+            if (TrackedIdx.HasValue)
+            {
+                var tracked = computeProgram.GetTrackedParticle();
+                var trackedPosition = tracked.position;
+                trackedPosition.Z -= app.simulation.followDistance;
+                var delta = trackedPosition - center;
+
+                var translate = delta * app.simulation.cameraFollowSpeed;
+
+                if (Math.Abs(delta.X) > 0.75 * app.simulation.config.width)
+                    translate.X = (float)Math.Sign(delta.X) * app.simulation.config.width;
+
+                if (Math.Abs(delta.Y) > 0.75 * app.simulation.config.height)
+                    translate.Y = (float)Math.Sign(delta.Y) * app.simulation.config.height;
+
+                if (Math.Abs(delta.Z) > 0.75 * app.simulation.config.depth)
+                    translate.Z = (float)Math.Sign(delta.Z) * app.simulation.config.depth;
+
+                center += translate;
+            }
+        }
+
         public void ResetOrigin()
         {
-            cameraDistance = app.simulation.config.depth;
             center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
         }
 
@@ -169,7 +216,6 @@ namespace ParticleLife3D.Gpu
             TrackedIdx = idx;
             app.simulation.config.trackedIdx = TrackedIdx ?? -1;
             computeProgram.Run(app.simulation.config, app.simulation.forces);
-            cameraDistance *= 0.1f;
         }
 
         public void StopTracking()
@@ -192,57 +238,6 @@ namespace ParticleLife3D.Gpu
 
             GL.Viewport(0, 0, glControl.Width, glControl.Height);
             glControl.Invalidate();
-        }
-
-        private Matrix4 GetProjectionMatrix()
-        {
-            Matrix4 view = Matrix4.LookAt(
-                new Vector3(center.X, center.Y, center.Z - cameraDistance),
-                new Vector3(center.X, center.Y, center.Z),
-                Vector3.UnitY
-);
-
-            Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(60f),
-                glControl.Width / (float)glControl.Height,
-                0.1f,
-                5000f
-            );
-
-            Matrix4 matrix = view * proj;
-            return matrix;
-        }
-
-        private void FollowTrackedParticle()
-        {
-            if (TrackedIdx.HasValue)
-            {
-                var projectionMatrix = GetProjectionMatrix();
-                var tracked = computeProgram.GetTrackedParticle();
-                var trackedPosition = tracked.position;
-                trackedPosition.Z -= app.simulation.followDistance;
-                var delta = trackedPosition - center;
-                
-                var move = delta * app.simulation.cameraFollowSpeed;
-
-                if (Math.Abs(delta.X) > 0.75* app.simulation.config.width)
-                {
-                    move.X = (float)Math.Sign(delta.X) * app.simulation.config.width;
-                }
-
-                if (Math.Abs(delta.Y) > 0.75 * app.simulation.config.height)
-                {
-                    move.Y = (float)Math.Sign(delta.Y) * app.simulation.config.height;
-                }
-
-                if (Math.Abs(delta.Z) > 0.75 * app.simulation.config.depth)
-                {
-                    move.Z = (float)Math.Sign(delta.Z) * app.simulation.config.depth;
-                }
-
-
-                center += move;
-            }
         }
 
         private void GlControl_Paint(object? sender, PaintEventArgs e)
@@ -286,7 +281,7 @@ namespace ParticleLife3D.Gpu
         private void Capture()
         {
             //combine PNGs into video:
-            //mp4: ffmpeg -f image2 -framerate 60 -i rec/frame_%05d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -r 60 -vcodec libx264 -pix_fmt yuv420p out.mp4 -y
+            //mp4: ffmpeg -f image2 -framerate 60 -i rec1/frame_%05d.png -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -r 60 -vcodec libx264 -pix_fmt yuv420p out.mp4 -y
             //gif: ffmpeg -framerate 60 -ss2 -i rec/frame_%05d.png -vf "select='not(mod(n,2))',setpts=N/FRAME_RATE/TB" -t 5 -r 20 simple2.gif
             //reduce bitrate:  ffmpeg -i in.mp4 -c:v libx264 -b:v 4236000 -pass 2 -c:a aac -b:a 128k out.mp4
             var recDir = app.configWindow.recordDir?.ToString();
