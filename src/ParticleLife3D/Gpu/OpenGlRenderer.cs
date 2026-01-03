@@ -154,9 +154,9 @@ namespace ParticleLife3D.Gpu
 
                 for (int idx = 0; idx < app.simulation.particles.Length; idx++)
                 {
-                    for (int x = -TorusRepeats*2; x <= TorusRepeats*2; x++)
-                        for (int y = -TorusRepeats*2; y <= TorusRepeats*2; y++)
-                            for (int z = -TorusRepeats*2; z <= TorusRepeats*2; z++)
+                    for (int x = -1; x <= 1; x++)
+                        for (int y = -1; y <= 1; y++)
+                            for (int z = -1; z <= 1; z++)
                             {
                                 var particlePosition = app.simulation.particles[idx].position;
                                 particlePosition.X += x * app.simulation.config.width;
@@ -195,12 +195,15 @@ namespace ParticleLife3D.Gpu
             return new Vector4(dirX, dirY, dirZ, 0);
         }
 
-        private Matrix4 GetCombinedProjectionMatrix()
+        private Matrix4 GetViewMatrix()
         {
-            var view = GetViewMatrix();
-            var proj = GetProjectionMatrix();
-            Matrix4 matrix = view * proj;
-            return matrix;
+            Matrix4 view = Matrix4.LookAt(
+                center.Xyz,
+                (center + GetCameraDirection()).Xyz,
+                Vector3.UnitY
+            );
+
+            return view;
         }
 
         private Matrix4 GetProjectionMatrix()
@@ -215,15 +218,12 @@ namespace ParticleLife3D.Gpu
             return proj;
         }
 
-        private Matrix4 GetViewMatrix()
+        private Matrix4 GetCombinedProjectionMatrix()
         {
-            Matrix4 view = Matrix4.LookAt(
-                center.Xyz,
-                (center + GetCameraDirection()).Xyz,
-                Vector3.UnitY
-            );
-
-            return view;
+            var view = GetViewMatrix();
+            var proj = GetProjectionMatrix();
+            Matrix4 matrix = view * proj;
+            return matrix;
         }
 
         private void FollowTrackedParticle()
@@ -231,11 +231,11 @@ namespace ParticleLife3D.Gpu
             if (TrackedIdx.HasValue)
             {
                 var tracked = computeProgram.GetTrackedParticle();
-                var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera back of tracked particle
+                var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera to back of tracked particle
                 var delta = cameraPosition - center;
                 var translate = delta * app.simulation.cameraFollowSpeed;
                 center += translate;
-                //center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
+                //do not correct torus then tracking not to interfere with fade. tracked.position will be torus corrected anyway
             }
         }
 
@@ -285,16 +285,7 @@ namespace ParticleLife3D.Gpu
                 lock (app.simulation)
                 {
                     FollowTrackedParticle();
-
-                    List<Vector4> torusOffsets = new List<Vector4>();
-                    for (int tx = -TorusRepeats; tx <= TorusRepeats; tx++)
-                        for (int ty = -TorusRepeats; ty <= TorusRepeats; ty++)
-                            for (int tz = -TorusRepeats; tz <= TorusRepeats; tz++)
-                            {
-                                var torusOffset = new Vector4(tx * app.simulation.config.width, ty * app.simulation.config.height, tz * app.simulation.config.depth, 0);
-                                torusOffsets.Add(torusOffset);
-                            }
-
+                    var torusOffsets = GetVisibleTorusOffsets();
                     var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
                     displayProgram.Run(GetProjectionMatrix(),
                         app.simulation.config.particleCount,
@@ -314,6 +305,34 @@ namespace ParticleLife3D.Gpu
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        private List<Vector4> GetVisibleTorusOffsets()
+        {
+            float W = app.simulation.config.width;
+            float H = app.simulation.config.height;
+            float D = app.simulation.config.depth;
+            float radius = 0.5f * MathF.Sqrt(W * W + H * H + D * D);
+            Vector3 localCenter = new Vector3(W, H, D) * 0.5f;
+            Vector3 camPos = center.Xyz;
+            Vector3 camDir = GetCameraDirection().Xyz;
+
+            List<Vector4> torusOffsets = new List<Vector4>();
+            for (int tx = -TorusRepeats; tx <= TorusRepeats; tx++)
+                for (int ty = -TorusRepeats; ty <= TorusRepeats; ty++)
+                    for (int tz = -TorusRepeats; tz <= TorusRepeats; tz++)
+                    {
+                        var torusOffset = new Vector4(tx * W, ty * H, tz * D, 0);
+                        Vector3 repeatCenter = localCenter + torusOffset.Xyz;
+                        Vector3 toRepeat = repeatCenter - camPos;
+                        float forward = Vector3.Dot(toRepeat, camDir);
+                        if (forward < -radius)
+                            continue;
+
+                        torusOffsets.Add(torusOffset);
+                    }
+
+            return torusOffsets;
         }
 
         public void Step()
