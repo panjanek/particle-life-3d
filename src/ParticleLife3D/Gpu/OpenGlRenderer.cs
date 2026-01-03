@@ -152,6 +152,17 @@ namespace ParticleLife3D.Gpu
             return matrix;
         }
 
+        private Matrix4 GetViewMatrix()
+        {
+            Matrix4 view = Matrix4.LookAt(
+                center.Xyz,
+                (center + GetCameraDirection()).Xyz,
+                Vector3.UnitY
+            );
+
+            return view;
+        }
+
         private void FollowTrackedParticle()
         {
             if (TrackedIdx.HasValue)
@@ -261,7 +272,11 @@ namespace ParticleLife3D.Gpu
                 lock (app.simulation)
                 {
                     FollowTrackedParticle();
-                    displayProgram.Run(GetProjectionMatrix(), app.simulation.config.particleCount, app.simulation.particleSize, new Vector2(glControl.Width, glControl.Height));
+                    displayProgram.Run(GetProjectionMatrix(), 
+                                       app.simulation.config.particleCount, 
+                                       app.simulation.particleSize, 
+                                       new Vector2(glControl.Width, glControl.Height),
+                                       GetViewMatrix());
                     glControl.SwapBuffers();
                     frameCounter++;
                 }

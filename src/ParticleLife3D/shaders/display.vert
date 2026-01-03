@@ -14,6 +14,7 @@ layout(std430, binding = 3) buffer OutputBuffer {
     Particle points[];
 };
 
+uniform mat4 view;
 uniform mat4 projection;
 uniform float paricleSize;
 uniform vec2 viewportSize;
@@ -21,6 +22,9 @@ uniform vec2 viewportSize;
 layout(location = 0) out vec3 vColor;
 layout(location = 1) out float vDepth;
 layout(location = 2) out float vFadingAlpha;
+layout(location = 3) out vec3 vCenterView;
+layout(location = 4) out vec2 vQuad;
+layout(location = 5) in vec2 quadPos;
 
 float fading_alpha(float r2)
 {
@@ -33,39 +37,26 @@ float fading_alpha(float r2)
 
 void main()
 {
-    uint id = gl_VertexID;
-
-    vec4 pos = points[id].position;
     
-    float fading = 1.0;
-    if (pos.w > 0)
-        fading = fading_alpha(pos.w);
-    vFadingAlpha = fading;
+    float sphereRadius = 20 * paricleSize + (viewportSize.x*0);
 
-    pos.w = 1.0;
-    if (points[id].flags == 2)
-        pos.w = 0;
+    uint id = gl_InstanceID;
+    Particle p = points[id];
 
+    vec4 worldPos = vec4(p.position.xyz, 1.0);
+    vec4 viewPos  = view * worldPos;
 
-    vec4 clip = projection * pos;
-    gl_Position = clip;
+    vCenterView = viewPos.xyz;
+    vQuad = quadPos;
 
-    float baseSize = paricleSize;
-    if (baseSize == 0)
-        baseSize = 2.0;
+    // Expand quad in view space
+    vec3 offset = vec3(quadPos * sphereRadius, 0.0);
+    vec4 pos = viewPos + vec4(offset, 0.0);
 
-    gl_PointSize = baseSize / clip.w;
+    gl_Position = projection * pos;
 
-    if (points[id].flags == 1)
-        baseSize = baseSize*1.5;
-
-    gl_PointSize = viewportSize.x * 5 * baseSize / clip.w;
-
-    float depth = clip.w;
-    vDepth = depth;
-
-    uint spec = points[id].species;
-    const vec3 colors[] = vec3[](
+    // species coloring as before
+        const vec3 colors[] = vec3[](
         vec3(1.0, 1.0, 0.0), // yellow
         vec3(1.0, 0.0, 1.0), // magenta
         vec3(0.0, 1.0, 1.0), // cyan
@@ -76,11 +67,5 @@ void main()
         vec3(0.5, 0.5, 0.5)  // gray
     );
 
-    vColor = colors[spec%8];
-
-    if (points[id].flags == 2)
-        vColor = vec3(0,0,0);
-
-    if (points[id].flags == 1)
-        vColor = vColor*1.25;
+    vColor = colors[p.species % 8];
 }
