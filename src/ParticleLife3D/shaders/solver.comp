@@ -19,6 +19,7 @@ struct ShaderConfig {
     float maxForce;
     float amp;
     int cellCount;
+    int totalCellCount;
     ivec4 disabled[4];
 };
 
@@ -59,7 +60,7 @@ layout(std430, binding = 5) writeonly buffer TrackingBuffer
     Particle tracked;
 };
 
-layout(std430, binding = 10) buffer SortedIndices {
+layout(std430, binding = 10) buffer CellIndices {
     uint particleIndices[];
 };
 

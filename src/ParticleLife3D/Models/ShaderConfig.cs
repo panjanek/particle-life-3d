@@ -43,7 +43,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(52)] public int cellCount = 0;
 
-        [FieldOffset(56)] int _pad0;
+        [FieldOffset(56)] public int totalCellCount = 0;
 
         [FieldOffset(60)] int _pad1;
 

@@ -19,6 +19,7 @@ struct ShaderConfig {
     float maxForce;
     float amp;
     int cellCount;
+    int totalCellCount;
     ivec4 disabled[4];
 };
 
@@ -45,39 +46,9 @@ layout(std430, binding = 1) buffer InputBuffer
     Particle particles[];
 };
 
-layout(std430, binding = 10) buffer SortedIndices {
-    uint particleIndices[];
+layout(std430, binding = 10) buffer CellIndices {
+    uint cellIndices[];
 };
-
-void torus_pos(inout vec4 pos)
-{
-    if (pos.x > config.fieldSize)
-        pos.x -= config.fieldSize;
-    else if (pos.x < 0)
-        pos.x += config.fieldSize;
-
-    if (pos.y > config.fieldSize)
-        pos.y -= config.fieldSize;
-    else if (pos.y < 0)
-        pos.y += config.fieldSize;
-
-    if (pos.z > config.fieldSize)
-        pos.z -= config.fieldSize;
-    else if (pos.z < 0)
-        pos.z += config.fieldSize;
-}
-
-void torus_dist(inout vec4 d)
-{
-    if (abs(d.x) > config.fieldSize / 2)
-        d.x -= config.fieldSize*sign(d.x);
-
-    if (abs(d.y) > config.fieldSize / 2)
-        d.y -= config.fieldSize*sign(d.y);
-
-    if (abs(d.z) > config.fieldSize / 2)
-        d.z -= config.fieldSize*sign(d.z);
-}
 
 int wrapCell(int c)
 {
@@ -103,6 +74,6 @@ void main()
     {
         int cellIndex = assign_cell(particles[idx].position);
         particles[idx].cellIndex = cellIndex;
-        particleIndices[idx] = cellIndex;
+        cellIndices[idx] = cellIndex;
     }
 }

@@ -1,0 +1,37 @@
+﻿#version 430
+layout(local_size_x = {LocalSizeX}) in;
+
+layout(std430, binding = 0) buffer KeysIn    { uint keysIn[];    };
+layout(std430, binding = 1) buffer ValuesIn { uint valsIn[];   };
+
+layout(std430, binding = 2) buffer KeysOut  { uint keysOut[];  };
+layout(std430, binding = 3) buffer ValuesOut{ uint valsOut[]; };
+
+layout(std430, binding = 5) buffer Offsets  { uint offsets[]; };
+
+uniform uint numElements;
+uniform uint shift;
+
+shared uint localOffsets[16];
+
+void main()
+{
+    uint lid = gl_LocalInvocationID.x;
+
+    if (lid < 16)
+        localOffsets[lid] = offsets[lid];
+
+    barrier();
+
+    uint id = gl_GlobalInvocationID.x;
+    if (id < numElements)
+    {
+        uint key = keysIn[id];
+        uint digit = (key >> shift) & 0xFu;
+
+        uint dst = atomicAdd(localOffsets[digit], 1);
+
+        keysOut[dst] = key;
+        valsOut[dst] = valsIn[id];
+    }
+}

@@ -17,6 +17,9 @@
   <ItemGroup>
     <EmbeddedResource Include="shaders\display.frag" />
     <EmbeddedResource Include="shaders\display.vert" />
+    <EmbeddedResource Include="shaders\radix_scatter.comp" />
+    <EmbeddedResource Include="shaders\radix_prefixsum.comp" />
+    <EmbeddedResource Include="shaders\radix_histogram.comp" />
     <EmbeddedResource Include="shaders\tiling.comp" />
     <EmbeddedResource Include="shaders\solver.comp" />
   </ItemGroup>
