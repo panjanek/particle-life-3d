@@ -66,6 +66,9 @@ namespace ParticleLife3D.Gpu
             if (dispatchGroupsX > maxGroupsX)
                 dispatchGroupsX = maxGroupsX;
 
+            config.cellCount = (int)Math.Ceiling(config.fieldSize / config.maxDist);
+            config.cellSize = config.fieldSize / config.cellCount;
+
             PrepareBuffer(config.particleCount);
 
             //upload config
