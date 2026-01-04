@@ -154,7 +154,7 @@
                 <ComboBox Name="fieldSize" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
                     <ComboBoxItem>300x300x300</ComboBoxItem>
                     <ComboBoxItem>500x500x500</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">750x750x750</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">800x800x800</ComboBoxItem>
                     <ComboBoxItem>1000x1000x1000</ComboBoxItem>
                     <ComboBoxItem>1500x1500x1500</ComboBoxItem>
                     <ComboBoxItem>2000x2000x2000</ComboBoxItem>
