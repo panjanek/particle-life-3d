@@ -116,31 +116,45 @@ float evaluateForceForOffset(uint offset, float dist)
     return 0.0;
 }
 
-void update_one(uint idx)
+vec4 compute_single_acceleration(Particle p, Particle other)
 {
-    vec4 pos = inParticles[idx].position;
-    vec4 vel = inParticles[idx].velocity;
-    int spec = inParticles[idx].species;
+    vec4 d = other.position - p.position;
+    torus_dist(d);
+    vec4 single_acc = vec4(0,0,0,0);
+    if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
+    {
+        float r2 = dot(d, d) + config.sigma2;
+        float r = sqrt(r2);
+        uint forceOffset = (p.species * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
+        float f = evaluateForceForOffset(forceOffset, r);
+        single_acc = config.amp * f * d / r;
+    }
 
+    return single_acc;
+}
+
+vec4 compute_total_acceleration(uint idx, Particle p)
+{
     vec4 acc = vec4(0.0);
     for(uint otherIdx = 0; otherIdx < config.particleCount; otherIdx++)
+    {
         if (idx != otherIdx)
         {
              Particle other = inParticles[otherIdx];
-             vec4 d = other.position - pos;
-             torus_dist(d);
-             if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist)
-             {
-
-                 float r2 = dot(d, d) + config.sigma2;
-                 float r = sqrt(r2);
-
-                 uint forceOffset = (spec * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
-                 float f = evaluateForceForOffset(forceOffset, r);
-
-                 acc += config.amp * f * d / r;
-             }
+             acc += compute_single_acceleration(p, other);
         }
+    }
+
+    return acc;
+}
+
+void update_one(uint idx)
+{
+    Particle p = inParticles[idx];
+    
+    vec4 acc = compute_total_acceleration(idx, p);
+    vec4 vel = p.velocity;
+    vec4 pos = p.position;
 
     //clamp acceleration
     if (config.clampAcc > 0.0)
@@ -161,17 +175,6 @@ void update_one(uint idx)
         vel *= inversesqrt(max(vel2, maxVel2)) * config.clampVel;
     }
 
-    //simple drag
-    //vel *= (1.0 - 0.8 * config.dt);
-    //quadratic drag, works with 0.03f;
-    /*
-    float speed = length(vel);
-    if (speed > 0.0)
-    {
-        vec2 drag = -config.damping * speed * vel;
-        vel += drag * config.dt;
-    }*/
-
     //exp drag
     float speed = length(vel);
     float drag = exp(-config.damping * speed * config.dt);
@@ -183,23 +186,20 @@ void update_one(uint idx)
     torus_pos(pos);
 
     //prepare updated particle struct
-    Particle updated;
-    updated.position = pos;
-    updated.velocity = vel;
-    updated.species = spec;
-    updated.flags = 0;
-    updated.cellIndex = inParticles[idx].cellIndex;
+    p.position = pos;
+    p.velocity = vel;
+    p.flags = 0;
     if (config.trackedIdx > -1 && config.trackedIdx == idx)
     {
-        updated.flags = 1;
-        tracked = updated;
+        p.flags = 1;
+        tracked = p;
     }
 
-    bool isDisabled = config.disabled[spec / 4][spec % 4] != 0;
+    bool isDisabled = config.disabled[p.species / 4][p.species % 4] != 0;
     if (isDisabled)
-        updated.flags = 2;
+        p.flags = 2;
 
-    outParticles[idx] = updated;
+    outParticles[idx] = p;
 }
 
 void main()
