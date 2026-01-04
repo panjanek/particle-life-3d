@@ -25,11 +25,11 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(16)] public float clampAcc = 0;
 
-        [FieldOffset(20)] public float width = 1920;
+        [FieldOffset(20)] public float fieldSize = 750;
 
-        [FieldOffset(24)] public float height = 1080;
+        [FieldOffset(24)] public float cellSize = 0;
 
-        [FieldOffset(28)] public float maxDist = 200;
+        [FieldOffset(28)] public float maxDist = 50;
 
         [FieldOffset(32)] public int speciesCount = 0;
 
@@ -41,7 +41,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(48)] public float amp = 1f;
 
-        [FieldOffset(52)] public float depth = 1000f;
+        [FieldOffset(52)] public float cellCount = 0;
 
         [FieldOffset(56)] int _pad0;
 

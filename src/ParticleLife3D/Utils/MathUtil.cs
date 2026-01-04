@@ -39,9 +39,9 @@ namespace ParticleLife3D.Utils
             return x;
         }
 
-        public static Vector4 TorusCorrection(Vector4 pos, float width, float height, float depth)
+        public static Vector4 TorusCorrection(Vector4 pos, float size)
         {
-            return new Vector4(TorusCorrection(pos.X, width), TorusCorrection(pos.Y, height), TorusCorrection(pos.Z, depth), pos.W);
+            return new Vector4(TorusCorrection(pos.X, size), TorusCorrection(pos.Y, size), TorusCorrection(pos.Z, size), pos.W);
         }
     }
 }

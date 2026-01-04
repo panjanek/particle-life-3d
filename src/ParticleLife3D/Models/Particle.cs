@@ -15,7 +15,7 @@ namespace ParticleLife3D.Models
         public Vector4 velocity; // xyz = velocity
         public int species;
         public int flags;
-        private int _pad0;
+        private int cellIndex;
         private int _pad1;
     }
 }

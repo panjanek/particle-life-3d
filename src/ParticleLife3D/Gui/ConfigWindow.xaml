@@ -127,10 +127,10 @@
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Number of particles" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
                 <ComboBox Name="particlesCount" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
-                    <ComboBoxItem>100</ComboBoxItem>
-                    <ComboBoxItem>1000</ComboBoxItem>
-                    <ComboBoxItem>2500</ComboBoxItem>
-                    <ComboBoxItem>5000</ComboBoxItem>
+                    <ComboBoxItem>300x300x300</ComboBoxItem>
+                    <ComboBoxItem>500x500x500</ComboBoxItem>
+                    <ComboBoxItem>750x750x750</ComboBoxItem>
+                    <ComboBoxItem>1000x1000x1000</ComboBoxItem>
                     <ComboBoxItem IsSelected="True">10000</ComboBoxItem>
                     <ComboBoxItem>50000</ComboBoxItem>
                     <ComboBoxItem>100000</ComboBoxItem>
@@ -151,13 +151,14 @@
                 </ComboBox>
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Size of the field" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
                 <ComboBox Name="fieldSize" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
-                    <ComboBoxItem>320x180</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">720x405</ComboBoxItem>
-                    <ComboBoxItem>1280x720</ComboBoxItem>
-                    <ComboBoxItem>1920x1080</ComboBoxItem>
-                    <ComboBoxItem>2560x1440</ComboBoxItem>
-                    <ComboBoxItem>3840x2160</ComboBoxItem>
-                    <ComboBoxItem>7680x4320</ComboBoxItem>
+                    <ComboBoxItem>300x300x300</ComboBoxItem>
+                    <ComboBoxItem>500x500x500</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">750x750x750</ComboBoxItem>
+                    <ComboBoxItem>1000x1000x1000</ComboBoxItem>
+                    <ComboBoxItem>1500x1500x1500</ComboBoxItem>
+                    <ComboBoxItem>2000x2000x2000</ComboBoxItem>
+                    <ComboBoxItem>5000x5000x5000</ComboBoxItem>
+                    <ComboBoxItem>10000x10000x10000</ComboBoxItem>
                 </ComboBox>
   
                 <!-- dt -->

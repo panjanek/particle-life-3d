@@ -56,13 +56,11 @@ namespace ParticleLife3D.Models
             forces = new Vector4[MaxSpeciesCount * MaxSpeciesCount * KeypointsCount];
         }
 
-        public void StartSimulation(int particlesCount, int speciesCount, float width, float height, float depth)
+        public void StartSimulation(int particlesCount, int speciesCount, float size)
         {
             var previousSpeciesCount = config.speciesCount;
             config.speciesCount = speciesCount;
-            config.width = width;
-            config.height = height;
-            config.depth = depth;
+            config.fieldSize = size;
             config.particleCount = particlesCount;
             InitializeParticles(particlesCount);
             var rnd = new Random(seed);
@@ -124,9 +122,9 @@ namespace ParticleLife3D.Models
             var rnd = new Random(1);
             for(int i=0; i< count; i++)
             {
-                particles[i].position = new Vector4((float)(config.width * rnd.NextDouble()), 
-                                                    (float)(config.height * rnd.NextDouble()),
-                                                    (float)(config.depth * rnd.NextDouble()),
+                particles[i].position = new Vector4((float)(config.fieldSize * rnd.NextDouble()), 
+                                                    (float)(config.fieldSize * rnd.NextDouble()),
+                                                    (float)(config.fieldSize * rnd.NextDouble()),
                                                     0);
                 particles[i].velocity = new Vector4((float)(100 * config.dt * (rnd.NextDouble()-0.5)), 
                                                     (float)(100 * config.dt * (rnd.NextDouble()-0.5)),

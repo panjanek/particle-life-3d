@@ -112,7 +112,7 @@ namespace ParticleLife3D.Gpu
                     Vector3 up = Vector3.Cross(right, forward.Xyz);
                     var trranslation = -right * delta.X + up * delta.Y;
                     center += new Vector4(trranslation.X, trranslation.Y, trranslation.Z, 0);
-                    center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
+                    center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
                 }
 
             }, () => { });
@@ -133,7 +133,7 @@ namespace ParticleLife3D.Gpu
                 {
                     //going forward/backward current camera direction
                     center += GetCameraDirection() * delta;
-                    center = MathUtil.TorusCorrection(center, app.simulation.config.width, app.simulation.config.height, app.simulation.config.depth);
+                    center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
                 }
             };
 
@@ -150,7 +150,7 @@ namespace ParticleLife3D.Gpu
                 computeProgram.DownloadData(app.simulation.particles);
                 int pixelRadius = 5;
                 int? selectedIdx = null;
-                float minDepth = app.simulation.config.depth * 10;
+                float minDepth = app.simulation.config.fieldSize * 10;
                 var projectionMatrix = GetCombinedProjectionMatrix();
                 for (int idx = 0; idx < app.simulation.particles.Length; idx++)
                 {
@@ -159,9 +159,9 @@ namespace ParticleLife3D.Gpu
                             for (int z = -1; z <= 1; z++)
                             {
                                 var particlePosition = app.simulation.particles[idx].position;
-                                particlePosition.X += x * app.simulation.config.width;
-                                particlePosition.Y += y * app.simulation.config.height;
-                                particlePosition.Z += z * app.simulation.config.depth;
+                                particlePosition.X += x * app.simulation.config.fieldSize;
+                                particlePosition.Y += y * app.simulation.config.fieldSize;
+                                particlePosition.Z += z * app.simulation.config.fieldSize;
 
                                 var screenAndDepth = GpuUtil.World3DToScreenWithDepth(particlePosition.Xyz, projectionMatrix, glControl.Width, glControl.Height);
                                 if (screenAndDepth.HasValue)
@@ -245,7 +245,7 @@ namespace ParticleLife3D.Gpu
         public void ResetOrigin()
         {
             StopTracking();
-            center = new Vector4(app.simulation.config.width / 2, app.simulation.config.height / 2, app.simulation.config.depth / 2, 1.0f);
+            center = new Vector4(app.simulation.config.fieldSize / 2, app.simulation.config.fieldSize / 2, app.simulation.config.fieldSize / 2, 1.0f);
             xzAngle = 0;
             yAngle = 0;
         }
@@ -300,11 +300,9 @@ namespace ParticleLife3D.Gpu
 
         private List<Vector4> GetVisibleTorusOffsets()
         {
-            float W = app.simulation.config.width;
-            float H = app.simulation.config.height;
-            float D = app.simulation.config.depth;
-            float radius = 0.5f * MathF.Sqrt(W * W + H * H + D * D);
-            Vector3 localCenter = new Vector3(W, H, D) * 0.5f;
+            float S = app.simulation.config.fieldSize;
+            float radius = 0.5f * MathF.Sqrt(3 * S * S);
+            Vector3 localCenter = new Vector3(S, S, S) * 0.5f;
             Vector3 camPos = center.Xyz;
             Vector3 camDir = GetCameraDirection().Xyz;
 
@@ -313,7 +311,7 @@ namespace ParticleLife3D.Gpu
                 for (int ty = -TorusRepeats; ty <= TorusRepeats; ty++)
                     for (int tz = -TorusRepeats; tz <= TorusRepeats; tz++)
                     {
-                        var torusOffset = new Vector4(tx * W, ty * H, tz * D, 0);
+                        var torusOffset = new Vector4(tx * S, ty * S, tz * S, 0);
                         Vector3 repeatCenter = localCenter + torusOffset.Xyz;
                         Vector3 toRepeat = repeatCenter - camPos;
                         float forward = Vector3.Dot(toRepeat, camDir);

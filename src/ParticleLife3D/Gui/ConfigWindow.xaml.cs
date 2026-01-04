@@ -207,14 +207,12 @@ namespace ParticleLife3D.Gui
                     var newParticleCount = int.Parse(newParticleCountStr);
                     var newSpeciesCount = int.Parse(newSpeciesCountStr);
                     var sizeSplit = newSizeStr.Split('x');
-                    var newWidth = int.Parse(sizeSplit[0]);
-                    var newHeight = int.Parse(sizeSplit[1]);
+                    var newSize = int.Parse(sizeSplit[0]);
                     if (newParticleCount != app.simulation.config.particleCount ||
                         newSpeciesCount != app.simulation.config.speciesCount ||
-                        newWidth != app.simulation.config.width ||
-                        newHeight != app.simulation.config.height)
+                        newSize != app.simulation.config.fieldSize)
                     {
-                        app.simulation.StartSimulation(newParticleCount, newSpeciesCount, newWidth, newHeight, newHeight);
+                        app.simulation.StartSimulation(newParticleCount, newSpeciesCount, newSize);
                         app.renderer.UploadParticleData();
                         ResetMatrix();
                         UpdateActiveControls();
@@ -255,7 +253,7 @@ namespace ParticleLife3D.Gui
         public void UpdateActiveControls()
         {
             updating = true;
-            WpfUtil.SetComboStringSelection(fieldSize, $"{app.simulation.config.width}x{app.simulation.config.height}");
+            WpfUtil.SetComboStringSelection(fieldSize, $"{app.simulation.config.fieldSize}x{app.simulation.config.fieldSize}x{app.simulation.config.fieldSize}");
             WpfUtil.SetComboStringSelection(particlesCount, app.simulation.config.particleCount.ToString());
             WpfUtil.SetComboStringSelection(speciesCount, app.simulation.config.speciesCount.ToString());
             foreach (var slider in WpfUtil.FindVisualChildren<Slider>(this))

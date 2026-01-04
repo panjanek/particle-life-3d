@@ -44,7 +44,7 @@ namespace ParticleLife3D
                 app = new AppContext();
                 app.mainWindow = this;
                 app.simulation = new Simulation();
-                app.simulation.StartSimulation(5000, 8, 720, 405, 405);
+                app.simulation.StartSimulation(5000, 8, 750);
                 app.renderer = new OpenGlRenderer(placeholder, app);
                 app.configWindow = new ConfigWindow(app);
                 app.configWindow.Show();

@@ -6,7 +6,7 @@ struct Particle
    vec4 velocity;
    int species;
    int flags;
-   int  _pad0;
+   int  cellIndex;
    int  _pad1;
 };
 
