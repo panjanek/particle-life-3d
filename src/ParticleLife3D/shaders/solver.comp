@@ -188,6 +188,7 @@ void update_one(uint idx)
     updated.velocity = vel;
     updated.species = spec;
     updated.flags = 0;
+    updated.cellIndex = inParticles[idx].cellIndex;
     if (config.trackedIdx > -1 && config.trackedIdx == idx)
     {
         updated.flags = 1;

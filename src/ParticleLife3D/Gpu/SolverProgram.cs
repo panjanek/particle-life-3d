@@ -12,11 +12,13 @@ using ParticleLife3D.Utils;
 
 namespace ParticleLife3D.Gpu
 {
-    public class ComputeProgram
+    public class SolverProgram
     {
         private int maxGroupsX;
 
-        private int program;
+        private int solvingProgram;
+
+        private int tilingProgram;
 
         private int uboConfig;
 
@@ -34,7 +36,7 @@ namespace ParticleLife3D.Gpu
 
         private Particle trackedParticle;
 
-        public ComputeProgram()
+        public SolverProgram()
         {
             uboConfig = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.UniformBuffer, uboConfig);
@@ -54,32 +56,42 @@ namespace ParticleLife3D.Gpu
 
             GL.GetInteger((OpenTK.Graphics.OpenGL.GetIndexedPName)All.MaxComputeWorkGroupCount, 0, out maxGroupsX);
             shaderPointStrideSize = Marshal.SizeOf<Particle>();
-            program = ShaderUtil.CompileAndLinkComputeShader("solver.comp");
+            solvingProgram = ShaderUtil.CompileAndLinkComputeShader("solver.comp");
+            tilingProgram = ShaderUtil.CompileAndLinkComputeShader("tiling.comp");
         }
 
         public void Run(ShaderConfig config, Vector4[] forces)
         {
+            int dispatchGroupsX = (pointsCount + ShaderUtil.LocalSizeX - 1) / ShaderUtil.LocalSizeX;
+            if (dispatchGroupsX > maxGroupsX)
+                dispatchGroupsX = maxGroupsX;
+
             PrepareBuffer(config.particleCount);
 
             //upload config
             GL.BindBuffer(BufferTarget.UniformBuffer, uboConfig);
             GL.BufferData(BufferTarget.UniformBuffer, Marshal.SizeOf<ShaderConfig>(), ref config, BufferUsageHint.StaticDraw);
-            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
 
+            // ------------------------ run tiling ---------------------------
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
+            GL.UseProgram(tilingProgram);
+            GL.DispatchCompute(dispatchGroupsX, 1, 1);
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+
+            // ------------------------ run solver --------------------------
             //upload forces
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, forcesBuffer);
             GL.BufferSubData(BufferTarget.ShaderStorageBuffer, 0, Marshal.SizeOf<Vector4>() * Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, forces);
 
-            //bind storage buffers
+            //bind ubo and buffers
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
 
-            GL.UseProgram(program);
-            int dispatchGroupsX = (pointsCount + ShaderUtil.LocalSizeX - 1) / ShaderUtil.LocalSizeX;
-            if (dispatchGroupsX > maxGroupsX)
-                dispatchGroupsX = maxGroupsX;
+            GL.UseProgram(solvingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
 

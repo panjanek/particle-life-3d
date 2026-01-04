@@ -1,0 +1,91 @@
+﻿#version 430
+
+#pragma optimize(on)
+
+layout(local_size_x = {LocalSizeX}) in;
+
+struct ShaderConfig {
+    int particleCount;
+    float dt;
+    float sigma2;
+    float clampVel;
+    float clampAcc;
+    float fieldSize;
+    float cellSize;
+    float maxDist;
+    int speciesCount;
+    float damping;
+    int trackedIdx;
+    float maxForce;
+    float amp;
+    float cellCount;
+    ivec4 disabled[4];
+};
+
+struct Particle
+{
+   vec4 position;
+   vec4 velocity;
+   int species;
+   int flags;
+   int  cellIndex;
+   int  _pad1;
+};
+
+#define MAX_SPECIES_COUNT     10
+#define KEYPOINTS_COUNT       6
+#define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
+
+layout(std140, binding = 0) uniform ConfigBuffer {
+    ShaderConfig config;
+};
+
+layout(std430, binding = 1) buffer InputBuffer
+{
+    Particle particles[];
+};
+
+void torus_pos(inout vec4 pos)
+{
+    if (pos.x > config.fieldSize)
+        pos.x -= config.fieldSize;
+    else if (pos.x < 0)
+        pos.x += config.fieldSize;
+
+    if (pos.y > config.fieldSize)
+        pos.y -= config.fieldSize;
+    else if (pos.y < 0)
+        pos.y += config.fieldSize;
+
+    if (pos.z > config.fieldSize)
+        pos.z -= config.fieldSize;
+    else if (pos.z < 0)
+        pos.z += config.fieldSize;
+}
+
+void torus_dist(inout vec4 d)
+{
+    if (abs(d.x) > config.fieldSize / 2)
+        d.x -= config.fieldSize*sign(d.x);
+
+    if (abs(d.y) > config.fieldSize / 2)
+        d.y -= config.fieldSize*sign(d.y);
+
+    if (abs(d.z) > config.fieldSize / 2)
+        d.z -= config.fieldSize*sign(d.z);
+}
+
+
+void update_one(uint idx)
+{
+    particles[idx].cellIndex = 9;
+}
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >=0 && idx < config.particleCount) 
+    {
+        update_one(idx);
+    }
+}

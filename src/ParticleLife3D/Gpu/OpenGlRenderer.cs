@@ -44,7 +44,7 @@ namespace ParticleLife3D.Gpu
 
         private int frameCounter;
 
-        private ComputeProgram computeProgram;
+        private SolverProgram solverProgram;
 
         private DisplayProgram displayProgram;
 
@@ -87,7 +87,7 @@ namespace ParticleLife3D.Gpu
             GL.BlendEquation(OpenTK.Graphics.OpenGL.BlendEquationMode.FuncAdd);
             GL.Enable(EnableCap.PointSprite);
 
-            computeProgram = new ComputeProgram();
+            solverProgram = new SolverProgram();
             displayProgram = new DisplayProgram();
             UploadParticleData();
             ResetOrigin();
@@ -147,7 +147,7 @@ namespace ParticleLife3D.Gpu
         {
             lock (app.simulation)
             {
-                computeProgram.DownloadData(app.simulation.particles);
+                solverProgram.DownloadData(app.simulation.particles);
                 int pixelRadius = 5;
                 int? selectedIdx = null;
                 float minDepth = app.simulation.config.fieldSize * 10;
@@ -233,7 +233,7 @@ namespace ParticleLife3D.Gpu
         {
             if (TrackedIdx.HasValue)
             {
-                var tracked = computeProgram.GetTrackedParticle();
+                var tracked = solverProgram.GetTrackedParticle();
                 var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera to back of tracked particle
                 var delta = cameraPosition - center;
                 var translate = delta * app.simulation.cameraFollowSpeed;
@@ -250,13 +250,13 @@ namespace ParticleLife3D.Gpu
             yAngle = 0;
         }
 
-        public void UploadParticleData() => computeProgram.UploadData(app.simulation.particles);
+        public void UploadParticleData() => solverProgram.UploadData(app.simulation.particles);
      
         public void StartTracking(int idx)
         {
             TrackedIdx = idx;
             app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-            computeProgram.Run(app.simulation.config, app.simulation.forces);
+            solverProgram.Run(app.simulation.config, app.simulation.forces);
         }
 
         public void StopTracking()
@@ -265,7 +265,7 @@ namespace ParticleLife3D.Gpu
             {
                 TrackedIdx = null;
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                computeProgram.Run(app.simulation.config, app.simulation.forces);
+                solverProgram.Run(app.simulation.config, app.simulation.forces);
             }
         }
 
@@ -285,7 +285,7 @@ namespace ParticleLife3D.Gpu
         {
             FollowTrackedParticle();
             var torusOffsets = GetVisibleTorusOffsets();
-            var trackedPos = TrackedIdx.HasValue ? computeProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
+            var trackedPos = TrackedIdx.HasValue ? solverProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
             displayProgram.Run(GetProjectionMatrix(),
                 app.simulation.config.particleCount,
                 app.simulation.particleSize,
@@ -333,7 +333,7 @@ namespace ParticleLife3D.Gpu
             if (!Paused)
             {
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                computeProgram.Run(app.simulation.config, app.simulation.forces);
+                solverProgram.Run(app.simulation.config, app.simulation.forces);
             }
 
             glControl.Invalidate();
