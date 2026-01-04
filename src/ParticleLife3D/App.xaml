@@ -23,10 +23,42 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBoxItem">
                         <Border
+                    x:Name="Border"
                     Background="{TemplateBinding Background}"
                     Padding="{TemplateBinding Padding}">
-                            <ContentPresenter/>
+
+                            <ContentPresenter
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"/>
                         </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <!-- Hover -->
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border"
+                                Property="Background"
+                                Value="#FF3399FF"/>
+                                <Setter Property="Foreground"
+                                Value="White"/>
+                            </Trigger>
+
+                            <!-- Selected -->
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border"
+                                Property="Background"
+                                Value="#FF2B7CD3"/>
+                                <Setter Property="Foreground"
+                                Value="White"/>
+                            </Trigger>
+
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground"
+                                Value="Gray"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -51,19 +83,21 @@
                             </Grid.ColumnDefinitions>
 
                             <!-- Selected item area -->
-                            <Border
-                        Grid.Column="0"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Padding="4">
+                            <ToggleButton
+    Grid.Column="0"
+    Focusable="False"
+    Background="{TemplateBinding Background}"
+    BorderBrush="{TemplateBinding BorderBrush}"
+    BorderThickness="{TemplateBinding BorderThickness}"
+    IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+    Padding="4">
 
                                 <ContentPresenter
-                            Content="{TemplateBinding SelectionBoxItem}"
-                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Left"/>
-                            </Border>
+        Content="{TemplateBinding SelectionBoxItem}"
+        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Left"/>
+                            </ToggleButton>
 
                             <!-- Drop-down button -->
                             <ToggleButton
@@ -90,9 +124,10 @@
     Focusable="False">
 
                                 <Border
-        Background="White"
-        BorderBrush="Gray"
-        BorderThickness="1">
+    Background="White"
+    BorderBrush="Gray"
+    BorderThickness="1"
+    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
 
                                     <ScrollViewer
             Background="White"

@@ -127,13 +127,14 @@
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Number of particles" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
                 <ComboBox Name="particlesCount" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" SelectionChanged="global_SelectionChanged" Margin="0,5,10,0">
-                    <ComboBoxItem>300x300x300</ComboBoxItem>
-                    <ComboBoxItem>500x500x500</ComboBoxItem>
-                    <ComboBoxItem>750x750x750</ComboBoxItem>
-                    <ComboBoxItem>1000x1000x1000</ComboBoxItem>
+                    <ComboBoxItem>500</ComboBoxItem>
+                    <ComboBoxItem>1000</ComboBoxItem>
+                    <ComboBoxItem>2500</ComboBoxItem>
+                    <ComboBoxItem>5000</ComboBoxItem>
                     <ComboBoxItem IsSelected="True">10000</ComboBoxItem>
                     <ComboBoxItem>50000</ComboBoxItem>
                     <ComboBoxItem>100000</ComboBoxItem>
+                    <ComboBoxItem>500000</ComboBoxItem>
                     <ComboBoxItem>1000000</ComboBoxItem>
                 </ComboBox>
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Number of species" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
