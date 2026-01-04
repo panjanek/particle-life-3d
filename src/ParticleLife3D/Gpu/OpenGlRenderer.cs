@@ -147,7 +147,8 @@ namespace ParticleLife3D.Gpu
         {
             lock (app.simulation)
             {
-                solverProgram.DownloadData(app.simulation.particles);
+                DebugUtil.DebugSolver(app.simulation, solverProgram);
+                solverProgram.DownloadParticles(app.simulation.particles);
                 int pixelRadius = 5;
                 int? selectedIdx = null;
                 float minDepth = app.simulation.config.fieldSize * 10;
@@ -250,13 +251,13 @@ namespace ParticleLife3D.Gpu
             yAngle = 0;
         }
 
-        public void UploadParticleData() => solverProgram.UploadData(app.simulation.particles);
+        public void UploadParticleData() => solverProgram.UploadParticles(app.simulation.particles);
      
         public void StartTracking(int idx)
         {
             TrackedIdx = idx;
             app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-            solverProgram.Run(app.simulation.config, app.simulation.forces);
+            solverProgram.Run(ref app.simulation.config, app.simulation.forces);
         }
 
         public void StopTracking()
@@ -265,7 +266,7 @@ namespace ParticleLife3D.Gpu
             {
                 TrackedIdx = null;
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                solverProgram.Run(app.simulation.config, app.simulation.forces);
+                solverProgram.Run(ref app.simulation.config, app.simulation.forces);
             }
         }
 
@@ -333,7 +334,7 @@ namespace ParticleLife3D.Gpu
             if (!Paused)
             {
                 app.simulation.config.trackedIdx = TrackedIdx ?? -1;
-                solverProgram.Run(app.simulation.config, app.simulation.forces);
+                solverProgram.Run(ref app.simulation.config, app.simulation.forces);
             }
 
             glControl.Invalidate();

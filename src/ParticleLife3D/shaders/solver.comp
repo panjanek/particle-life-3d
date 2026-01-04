@@ -18,7 +18,7 @@ struct ShaderConfig {
     int trackedIdx;
     float maxForce;
     float amp;
-    float cellCount;
+    int cellCount;
     ivec4 disabled[4];
 };
 
@@ -57,6 +57,10 @@ layout(std430, binding = 4) readonly buffer ForceBuffer {
 layout(std430, binding = 5) writeonly buffer TrackingBuffer
 {
     Particle tracked;
+};
+
+layout(std430, binding = 10) buffer SortedIndices {
+    uint particleIndices[];
 };
 
 void torus_pos(inout vec4 pos)

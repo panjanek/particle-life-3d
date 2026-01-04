@@ -30,6 +30,8 @@ namespace ParticleLife3D.Gpu
 
         private int trackingBuffer;
 
+        private int particleIndicesBuffer;
+
         private int pointsCount;
 
         private int shaderPointStrideSize;
@@ -60,7 +62,7 @@ namespace ParticleLife3D.Gpu
             tilingProgram = ShaderUtil.CompileAndLinkComputeShader("tiling.comp");
         }
 
-        public void Run(ShaderConfig config, Vector4[] forces)
+        public void Run(ref ShaderConfig config, Vector4[] forces)
         {
             int dispatchGroupsX = (pointsCount + ShaderUtil.LocalSizeX - 1) / ShaderUtil.LocalSizeX;
             if (dispatchGroupsX > maxGroupsX)
@@ -69,7 +71,7 @@ namespace ParticleLife3D.Gpu
             config.cellCount = (int)Math.Ceiling(config.fieldSize / config.maxDist);
             config.cellSize = config.fieldSize / config.cellCount;
 
-            PrepareBuffer(config.particleCount);
+            PrepareBuffers(config.particleCount);
 
             //upload config
             GL.BindBuffer(BufferTarget.UniformBuffer, uboConfig);
@@ -78,6 +80,7 @@ namespace ParticleLife3D.Gpu
             // ------------------------ run tiling ---------------------------
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, particleIndicesBuffer);
             GL.UseProgram(tilingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
@@ -93,6 +96,7 @@ namespace ParticleLife3D.Gpu
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, particleIndicesBuffer);
 
             GL.UseProgram(solvingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
@@ -101,18 +105,18 @@ namespace ParticleLife3D.Gpu
             (pointsBufferA, pointsBufferB) = (pointsBufferB, pointsBufferA);
         }
 
-        public void UploadData(Particle[] particles)
+        public void UploadParticles(Particle[] particles)
         {
-            PrepareBuffer(particles.Length);
+            PrepareBuffers(particles.Length);
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferA);
             GL.BufferSubData(BufferTarget.ShaderStorageBuffer, 0, particles.Length * shaderPointStrideSize, particles);
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferB);
             GL.BufferSubData(BufferTarget.ShaderStorageBuffer, 0, particles.Length * shaderPointStrideSize, particles);
         }
 
-        public void DownloadData(Particle[] particles)
+        public void DownloadParticles(Particle[] particles, bool bufferB = false)
         {
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferA);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferB ? pointsBufferB : pointsBufferA);
 
             GL.GetBufferSubData(
                 BufferTarget.ShaderStorageBuffer,
@@ -139,7 +143,24 @@ namespace ParticleLife3D.Gpu
             return trackedParticle;
         }
 
-        private void PrepareBuffer(int size)
+        public int[] DownloadIndices()
+        {
+            var buffer = new int[pointsCount];
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, particleIndicesBuffer);
+
+            GL.GetBufferSubData(
+                BufferTarget.ShaderStorageBuffer,
+                IntPtr.Zero,
+                pointsCount * Marshal.SizeOf<int>(),
+                buffer
+            );
+
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+
+            return buffer;
+        }
+
+        private void PrepareBuffers(int size)
         {
             if (pointsCount != size)
             {
@@ -164,6 +185,16 @@ namespace ParticleLife3D.Gpu
                 GL.GenBuffers(1, out pointsBufferB);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferB);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
+
+                //particle indices
+                if (particleIndicesBuffer > 0)
+                {
+                    GL.DeleteBuffer(particleIndicesBuffer);
+                    particleIndicesBuffer = 0;
+                }
+                GL.GenBuffers(1, out particleIndicesBuffer);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, particleIndicesBuffer);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * Marshal.SizeOf<int>(), IntPtr.Zero, BufferUsageHint.DynamicDraw);
              }
         }
     }

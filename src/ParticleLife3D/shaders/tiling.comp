@@ -18,7 +18,7 @@ struct ShaderConfig {
     int trackedIdx;
     float maxForce;
     float amp;
-    float cellCount;
+    int cellCount;
     ivec4 disabled[4];
 };
 
@@ -43,6 +43,10 @@ layout(std140, binding = 0) uniform ConfigBuffer {
 layout(std430, binding = 1) buffer InputBuffer
 {
     Particle particles[];
+};
+
+layout(std430, binding = 10) buffer SortedIndices {
+    uint particleIndices[];
 };
 
 void torus_pos(inout vec4 pos)
@@ -75,10 +79,21 @@ void torus_dist(inout vec4 d)
         d.z -= config.fieldSize*sign(d.z);
 }
 
-
-void update_one(uint idx)
+int wrapCell(int c)
 {
-    particles[idx].cellIndex = 9;
+    return (c % config.cellCount + config.cellCount) % config.cellCount;
+}
+
+
+int assign_cell(vec4 pos)
+{
+    ivec4 cell = ivec4(pos / config.cellSize);
+    cell.x = wrapCell(cell.x);
+    cell.y = wrapCell(cell.y);
+    cell.z = wrapCell(cell.z);
+    return cell.x +
+           cell.y * config.cellCount +
+           cell.z * config.cellCount * config.cellCount;
 }
 
 void main()
@@ -86,6 +101,8 @@ void main()
     uint idx = gl_GlobalInvocationID.x;
     if (idx >=0 && idx < config.particleCount) 
     {
-        update_one(idx);
+        int cellIndex = assign_cell(particles[idx].position);
+        particles[idx].cellIndex = cellIndex;
+        particleIndices[idx] = cellIndex;
     }
 }
