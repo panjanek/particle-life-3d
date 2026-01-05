@@ -16,22 +16,15 @@ shared uint localOffsets[16];
 
 void main()
 {
-    uint lid = gl_LocalInvocationID.x;
-
-    if (lid < 16)
-        localOffsets[lid] = offsets[lid];
-
-    barrier();
-
     uint id = gl_GlobalInvocationID.x;
-    if (id < numElements)
-    {
-        uint key = keysIn[id];
-        uint digit = (key >> shift) & 0xFu;
+    if (id >= numElements) return;
 
-        uint dst = atomicAdd(localOffsets[digit], 1);
+    uint key = keysIn[id];
+    uint digit = (key >> shift) & 0xFu;
 
-        keysOut[dst] = key;
-        valsOut[dst] = valsIn[id];
-    }
+    // GLOBAL atomic
+    uint dst = atomicAdd(offsets[digit], 1);
+
+    keysOut[dst] = key;
+    valsOut[dst] = valsIn[id];
 }

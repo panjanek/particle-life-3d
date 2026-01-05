@@ -20,7 +20,8 @@
     <EmbeddedResource Include="shaders\radix_scatter.comp" />
     <EmbeddedResource Include="shaders\radix_prefixsum.comp" />
     <EmbeddedResource Include="shaders\radix_histogram.comp" />
-    <EmbeddedResource Include="shaders\tiling.comp" />
+    <EmbeddedResource Include="shaders\tiling_bin.comp" />
+    <EmbeddedResource Include="shaders\tiling_count.comp" />
     <EmbeddedResource Include="shaders\solver.comp" />
   </ItemGroup>
 

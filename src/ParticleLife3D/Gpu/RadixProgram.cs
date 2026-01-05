@@ -10,6 +10,7 @@ using ParticleLife3D.Models;
 
 namespace ParticleLife3D.Gpu
 {
+    //https://gpuopen.com/learn/boosting_gpu_radix_sort/
     public class RadixProgram
     {
         const int RADIX_BITS = 4;
@@ -67,11 +68,16 @@ namespace ParticleLife3D.Gpu
             if (dispatchGroupsX > maxGroupsX)
                 dispatchGroupsX = maxGroupsX;
 
+            dispatchGroupsX = 1;
+
             GL.CopyNamedBufferSubData(cellIndicesBuffer, keysA, IntPtr.Zero, IntPtr.Zero, currentParticlesCount * sizeof(uint));
             GL.MemoryBarrier(MemoryBarrierFlags.BufferUpdateBarrierBit);
 
             int inKeys = keysA, outKeys = keysB;
             int inVals = valsA, outVals = valsB;
+
+            var testInKeys = DownloadIntBuffer(inKeys, currentParticlesCount);  //confirmed: contains cell indices, not sorted
+            var testinVals = DownloadIntBuffer(inVals, currentParticlesCount);  //confirmed: contains ordered particle indices: 0,1,2,3...
 
             for (int pass = 0; pass < PASSES; pass++)
             {
@@ -87,14 +93,8 @@ namespace ParticleLife3D.Gpu
 
                 // ---- 2) Histogram pass ----
                 GL.UseProgram(histogramProgram);
-
-
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, inKeys);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 14, histogram);
-
-                var testInKeys = DownloadIntBuffer(inKeys, currentParticlesCount);
-                var testinVals = DownloadIntBuffer(inVals, currentParticlesCount);
-
                 GL.Uniform1(histNumElementsLoc, (uint)config.particleCount);
                 GL.Uniform1(histShiftLoc, (uint)shift);
                 GL.DispatchCompute(dispatchGroupsX, 1, 1);
@@ -103,6 +103,15 @@ namespace ParticleLife3D.Gpu
                 var testHistogram = DownloadIntBuffer(histogram, 16);
 
                 // ---- 3) Prefix sum pass ----
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, offsets);
+                GL.ClearBufferData(
+                    BufferTarget.ShaderStorageBuffer,
+                    PixelInternalFormat.R32ui,
+                    PixelFormat.RedInteger,
+                    PixelType.UnsignedInt,
+                    IntPtr.Zero
+                );
+
                 GL.UseProgram(prefixsumProgram);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 14, histogram);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 15, offsets);
@@ -130,13 +139,15 @@ namespace ParticleLife3D.Gpu
                 var testOutKeys = DownloadIntBuffer(outKeys, config.particleCount);
                 var testOutVals = DownloadIntBuffer(outVals, config.particleCount);
 
+                testOutKeys = testOutKeys.Select(x => x % 4).ToArray();
+
                 // ---- swap ping-pong ----
                 (inKeys, outKeys) = (outKeys, inKeys);
                 (inVals, outVals) = (outVals, inVals);
             }
 
-            var testKeys = DownloadIntBuffer(inKeys, config.particleCount);
-            var testVals = DownloadIntBuffer(inVals, config.particleCount);
+            var testKeys = DownloadIntBuffer(inKeys, config.particleCount);   
+            var testVals = DownloadIntBuffer(inVals, config.particleCount);   
 
             var a = 1;
         }

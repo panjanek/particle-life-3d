@@ -18,7 +18,9 @@ namespace ParticleLife3D.Gpu
 
         private int solvingProgram;
 
-        private int tilingProgram;
+        private int tilingCountProgram;
+
+        private int tilingBinProgram;
 
         private int uboConfig;
 
@@ -30,11 +32,12 @@ namespace ParticleLife3D.Gpu
 
         private int trackingBuffer;
 
-        public int cellIndicesBuffer;
+        public int cellCountBuffer;
 
-        private int cellStartBuffer;               // cellCountTotal uints
+        public int cellOffsetBuffer;
+        public int cellOffsetBuffer2;
 
-        private int cellCountBuffer;               // cellCountTotal uints
+        public int particleIndicesBuffer;
 
         private int currentParticlesCount;
 
@@ -42,7 +45,9 @@ namespace ParticleLife3D.Gpu
 
         private int shaderPointStrideSize;
 
-        public RadixProgram radixProgram;
+        public int[] cellCounts;
+
+        public int[] cellOffsets;
 
         private Particle trackedParticle;
 
@@ -61,9 +66,8 @@ namespace ParticleLife3D.Gpu
             GL.GetInteger((OpenTK.Graphics.OpenGL.GetIndexedPName)All.MaxComputeWorkGroupCount, 0, out maxGroupsX);
             shaderPointStrideSize = Marshal.SizeOf<Particle>();
             solvingProgram = ShaderUtil.CompileAndLinkComputeShader("solver.comp");
-            tilingProgram = ShaderUtil.CompileAndLinkComputeShader("tiling.comp");
-
-            radixProgram = new RadixProgram();
+            tilingCountProgram = ShaderUtil.CompileAndLinkComputeShader("tiling_count.comp");
+            tilingBinProgram = ShaderUtil.CompileAndLinkComputeShader("tiling_bin.comp");
         }
 
         public void Run(ref ShaderConfig config, Vector4[] forces)
@@ -76,25 +80,58 @@ namespace ParticleLife3D.Gpu
             config.cellCount = (int)Math.Floor(config.fieldSize / config.maxDist);
             config.cellSize = config.fieldSize / config.cellCount;
             config.totalCellCount = config.cellCount * config.cellCount * config.cellCount;
+            PrepareBuffers(config.particleCount, config.totalCellCount);
 
-           
-            radixProgram.PrepareBuffers(config.particleCount);
 
             //upload config
             GL.BindBuffer(BufferTarget.UniformBuffer, uboConfig);
             GL.BufferData(BufferTarget.UniformBuffer, Marshal.SizeOf<ShaderConfig>(), ref config, BufferUsageHint.StaticDraw);
 
             // ------------------------ run tiling ---------------------------
+            //count
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, cellCountBuffer);
+            GL.ClearBufferData(
+                BufferTarget.ShaderStorageBuffer,
+                PixelInternalFormat.R32ui,
+                PixelFormat.RedInteger,
+                PixelType.UnsignedInt,
+                IntPtr.Zero
+            );
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
-            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, cellIndicesBuffer);
-            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, radixProgram.valsA);
-            GL.UseProgram(tilingProgram);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, cellCountBuffer);
+            GL.UseProgram(tilingCountProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+
+            //offset
+            DownloadIntBuffer(cellCounts, cellCountBuffer, currentTotalCellsCount);
+            int sum = 0;
+            for(int c=0; c<currentTotalCellsCount; c++)
+            {
+                cellOffsets[c] = sum;
+                sum += cellCounts[c];
+            }
+
+            //fill
+            UploadIntBuffer(cellOffsets, cellOffsetBuffer, currentTotalCellsCount);
+            GL.CopyNamedBufferSubData(cellOffsetBuffer, cellOffsetBuffer2, IntPtr.Zero, IntPtr.Zero, currentTotalCellsCount * sizeof(uint));
+            GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, cellOffsetBuffer);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 8, particleIndicesBuffer);
+
+            GL.UseProgram(tilingBinProgram);
+            GL.DispatchCompute(dispatchGroupsX, 1, 1);
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
+
+            /*
+            var offsetsBroken = new int[currentTotalCellsCount];
+            DownloadIntBuffer(offsetsBroken, cellOffsetBuffer, currentTotalCellsCount);
+            var offsetsOk = new int[currentTotalCellsCount];
+            DownloadIntBuffer(offsetsOk, cellOffsetBuffer2, currentTotalCellsCount);
+            */
             DebugUtil.DebugSolver(false, config, this);
-            // ------------------------ run sorting and grouping -------------
-            radixProgram.Run(config, cellIndicesBuffer);
 
             // ------------------------ run solver --------------------------
             //upload forces
@@ -107,7 +144,6 @@ namespace ParticleLife3D.Gpu
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
-            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, cellIndicesBuffer);
 
             GL.UseProgram(solvingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
@@ -154,9 +190,8 @@ namespace ParticleLife3D.Gpu
             return trackedParticle;
         }
 
-        public int[] DownloadIntBuffer(int bufferId, int size)
+        public void DownloadIntBuffer(int[] buffer, int bufferId, int size)
         {
-            var buffer = new int[size];
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
 
             GL.GetBufferSubData(
@@ -167,8 +202,12 @@ namespace ParticleLife3D.Gpu
             );
 
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+        }
 
-            return buffer;
+        public void UploadIntBuffer(int[] buffer, int bufferId, int size)
+        {
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
+            GL.BufferSubData(BufferTarget.ShaderStorageBuffer, 0, size * Marshal.SizeOf<int>(), buffer);
         }
 
         private void PrepareBuffers(int particlesCount, int totalCellsCount)
@@ -178,14 +217,17 @@ namespace ParticleLife3D.Gpu
                 currentParticlesCount = particlesCount;
                 CreateBuffer(ref pointsBufferA, currentParticlesCount, shaderPointStrideSize);
                 CreateBuffer(ref pointsBufferB, currentParticlesCount, shaderPointStrideSize);
-                CreateBuffer(ref cellIndicesBuffer, currentParticlesCount, Marshal.SizeOf<int>());
+                CreateBuffer(ref particleIndicesBuffer, currentParticlesCount, Marshal.SizeOf<int>());
             }
 
             if (currentTotalCellsCount != totalCellsCount)
             {
-                currentTotalCellsCount = particlesCount;
-                CreateBuffer(ref cellStartBuffer, currentTotalCellsCount, Marshal.SizeOf<int>());
+                currentTotalCellsCount = totalCellsCount;
                 CreateBuffer(ref cellCountBuffer, currentTotalCellsCount, Marshal.SizeOf<int>());
+                CreateBuffer(ref cellOffsetBuffer, currentTotalCellsCount, Marshal.SizeOf<int>());
+                CreateBuffer(ref cellOffsetBuffer2, currentTotalCellsCount, Marshal.SizeOf<int>());
+                cellCounts = new int[totalCellsCount];
+                cellOffsets = new int[totalCellsCount];
             }
         }
 

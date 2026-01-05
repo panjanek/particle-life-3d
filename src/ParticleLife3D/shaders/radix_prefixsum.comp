@@ -7,10 +7,12 @@ layout(std430, binding = 15) buffer Offsets   { uint offs[]; };
 void main()
 {
     uint id = gl_LocalInvocationID.x;
+    if (id < 16)
+    {
+        uint sum = 0;
+        for (uint i = 0; i < id; ++i)
+            sum += hist[i];
 
-    uint sum = 0;
-    for (uint i = 0; i < id; ++i)
-        sum += hist[i];
-
-    offs[id] = sum;
+        offs[id] = sum;
+    }
 }

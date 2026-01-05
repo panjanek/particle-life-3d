@@ -33,10 +33,6 @@ struct Particle
    int  _pad1;
 };
 
-#define MAX_SPECIES_COUNT     10
-#define KEYPOINTS_COUNT       6
-#define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
-
 layout(std140, binding = 0) uniform ConfigBuffer {
     ShaderConfig config;
 };
@@ -46,39 +42,21 @@ layout(std430, binding = 1) buffer InputBuffer
     Particle particles[];
 };
 
-layout(std430, binding = 6) buffer CellIndices {
-    uint cellIndices[];
+layout(std430, binding = 7) buffer CellOffsets {
+    uint cellOffsets[];
 };
 
-layout(std430, binding = 7) buffer ParticleIndices {
+layout(std430, binding = 8) buffer ParticleIndices {
     uint particleIndices[];
 };
-
-int wrapCell(int c)
-{
-    return (c % config.cellCount + config.cellCount) % config.cellCount;
-}
-
-
-int assign_cell(vec4 pos)
-{
-    ivec4 cell = ivec4(pos / config.cellSize);
-    cell.x = wrapCell(cell.x);
-    cell.y = wrapCell(cell.y);
-    cell.z = wrapCell(cell.z);
-    return cell.x +
-           cell.y * config.cellCount +
-           cell.z * config.cellCount * config.cellCount;
-}
 
 void main()
 {
     uint idx = gl_GlobalInvocationID.x;
     if (idx >=0 && idx < config.particleCount) 
     {
-        int cellIndex = assign_cell(particles[idx].position);
-        particles[idx].cellIndex = cellIndex;
-        cellIndices[idx] = cellIndex;
-        particleIndices[idx] = idx;
+        int cellIndex = particles[idx].cellIndex;
+        uint offset = atomicAdd(cellOffsets[cellIndex], 1);
+        particleIndices[offset] = idx;    
     }
 }

@@ -1,0 +1,75 @@
+﻿#version 430
+
+#pragma optimize(on)
+
+layout(local_size_x = {LocalSizeX}) in;
+
+struct ShaderConfig {
+    int particleCount;
+    float dt;
+    float sigma2;
+    float clampVel;
+    float clampAcc;
+    float fieldSize;
+    float cellSize;
+    float maxDist;
+    int speciesCount;
+    float damping;
+    int trackedIdx;
+    float maxForce;
+    float amp;
+    int cellCount;
+    int totalCellCount;
+    ivec4 disabled[4];
+};
+
+struct Particle
+{
+   vec4 position;
+   vec4 velocity;
+   int species;
+   int flags;
+   int  cellIndex;
+   int  _pad1;
+};
+
+layout(std140, binding = 0) uniform ConfigBuffer {
+    ShaderConfig config;
+};
+
+layout(std430, binding = 1) buffer InputBuffer
+{
+    Particle particles[];
+};
+
+layout(std430, binding = 6) buffer CellCount {
+    uint cellCount[];
+};
+
+
+int wrapCell(int c)
+{
+    return (c % config.cellCount + config.cellCount) % config.cellCount;
+}
+
+int assign_cell(vec4 pos)
+{
+    ivec4 cell = ivec4(pos / config.cellSize);
+    cell.x = wrapCell(cell.x);
+    cell.y = wrapCell(cell.y);
+    cell.z = wrapCell(cell.z);
+    return cell.x +
+           cell.y * config.cellCount +
+           cell.z * config.cellCount * config.cellCount;
+}
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if (idx >=0 && idx < config.particleCount) 
+    {
+        int cellIndex = assign_cell(particles[idx].position);
+        particles[idx].cellIndex = cellIndex;
+        atomicAdd(cellCount[cellIndex], 1);
+    }
+}

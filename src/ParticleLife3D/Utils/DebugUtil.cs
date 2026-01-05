@@ -18,6 +18,8 @@ namespace ParticleLife3D.Utils
 
         private static Particle[] particles;
 
+        private static int[] particleIndices;
+
         public static void Log(string message)
         {
             File.AppendAllText(LogFile, $"{message}\n");
@@ -26,11 +28,19 @@ namespace ParticleLife3D.Utils
         public static void DebugSolver(bool bufferB, ShaderConfig config, SolverProgram solver)
         {
             if (particles == null || particles.Length != config.particleCount)
+            {
                 particles = new Particle[config.particleCount];
+                particleIndices = new int[config.particleCount];
+            }
+
             solver.DownloadParticles(particles, bufferB);
-            var cellIndices = solver.DownloadIntBuffer(solver.cellIndicesBuffer, config.particleCount);
-            var particleIndices = solver.DownloadIntBuffer(solver.radixProgram.valsA, config.particleCount);
+            var counts = solver.cellCounts;
+            var offsets = solver.cellOffsets;
+            solver.DownloadIntBuffer(particleIndices, solver.particleIndicesBuffer, config.particleCount);
+
             var cellSize = config.cellSize;
+
+            List<int>[] expected = new List<int>[config.totalCellCount];
             for(int idx = 0; idx<config.particleCount; idx++)
             {
                 var p = particles[idx];
@@ -42,17 +52,28 @@ namespace ParticleLife3D.Utils
                     p.position.Y >= gridY * cellSize && p.position.Y < (gridY + 1) * cellSize &&
                     p.position.Z >= gridZ * cellSize && p.position.Z < (gridZ + 1) * cellSize)
                 {
-
+                    if (expected[p.cellIndex] == null)
+                        expected[p.cellIndex] = new List<int>();
+                    expected[p.cellIndex].Add(idx);
                 }
                 else
                 {
                     throw new Exception("bad cell");
                 }
-
-                if (p.cellIndex != cellIndices[idx])
-                    throw new Exception("bad index");
             }
 
+            for(int cellIdx=0; cellIdx < config.totalCellCount; cellIdx++)
+            {
+                var expectedList = expected[cellIdx].OrderBy(x => x).ToArray();
+                var computed = particleIndices.Skip(offsets[cellIdx]).Take(counts[cellIdx]).OrderBy(x => x).ToArray();
+                if (expectedList.Length != computed.Length)
+                    throw new Exception("invalid counts");
+
+                for (int i = 0; i < computed.Length; i++)
+                    if (expectedList[i] != computed[i])
+                        throw new Exception($"difference at {i} for {cellIdx}");
+            }
+            Console.WriteLine("seems ok");
 
 
         }
