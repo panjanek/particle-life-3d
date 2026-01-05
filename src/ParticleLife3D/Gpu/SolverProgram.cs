@@ -118,14 +118,8 @@ namespace ParticleLife3D.Gpu
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
 
-            /*
-            var offsetsBroken = new int[currentTotalCellsCount];
-            DownloadIntBuffer(offsetsBroken, cellOffsetBuffer, currentTotalCellsCount);
-            var offsetsOk = new int[currentTotalCellsCount];
-            DownloadIntBuffer(offsetsOk, cellOffsetBuffer2, currentTotalCellsCount);
-            */
-            //DebugUtil.DebugSolver(false, config, this);
 
+            //DebugUtil.DebugSolver(false, config, this);
             // ------------------------ run solver --------------------------
             //upload forces
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, forcesBuffer);

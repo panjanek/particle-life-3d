@@ -147,7 +147,7 @@ namespace ParticleLife3D.Gpu
         {
             lock (app.simulation)
             {
-                DebugUtil.DebugSolver(true, app.simulation.config, solverProgram);
+                //DebugUtil.DebugSolver(true, app.simulation.config, solverProgram);
                 solverProgram.DownloadParticles(app.simulation.particles);
                 int pixelRadius = 5;
                 int? selectedIdx = null;
