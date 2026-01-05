@@ -60,7 +60,15 @@ layout(std430, binding = 5) writeonly buffer TrackingBuffer
     Particle tracked;
 };
 
-layout(std430, binding = 6) buffer CellIndices {
+layout(std430, binding = 6) buffer CellCount {
+    uint cellCounts[];
+};
+
+layout(std430, binding = 7) buffer CellOffsets {
+    uint cellOffsets[];
+};
+
+layout(std430, binding = 8) buffer ParticleIndices {
     uint particleIndices[];
 };
 
@@ -138,6 +146,7 @@ vec4 compute_single_acceleration(Particle p, Particle other)
     return single_acc;
 }
 
+/*
 vec4 compute_total_acceleration(uint idx, Particle p)
 {
     vec4 acc = vec4(0.0);
@@ -147,6 +156,46 @@ vec4 compute_total_acceleration(uint idx, Particle p)
         {
              Particle other = inParticles[otherIdx];
              acc += compute_single_acceleration(p, other);
+        }
+    }
+
+    return acc;
+}*/
+
+int wrapCell(int c)
+{
+    return (c % config.cellCount + config.cellCount) % config.cellCount;
+}
+
+vec4 compute_total_acceleration(uint idx, Particle p)
+{
+    int gridX = p.cellIndex % config.cellCount;
+    int gridY = (p.cellIndex / config.cellCount) % config.cellCount;
+    int gridZ = p.cellIndex / (config.cellCount * config.cellCount);
+    ivec3 main = ivec3(gridX, gridY, gridZ);
+
+    vec4 acc = vec4(0.0);
+    for (int dz = -1; dz <= 1; dz++)
+    for (int dy = -1; dy <= 1; dy++)
+    for (int dx = -1; dx <= 1; dx++)
+    {
+        ivec3 cell = main + ivec3(dx, dy, dz);
+        cell.x = wrapCell(cell.x);
+        cell.y = wrapCell(cell.y);
+        cell.z = wrapCell(cell.z);
+        uint cellIdx = cell.x +
+                       cell.y * config.cellCount +
+                       cell.z * config.cellCount * config.cellCount;
+        uint offset = cellOffsets[cellIdx];
+        uint count = cellCounts[cellIdx];
+        for(uint indiceIdx = offset; indiceIdx<offset + count; indiceIdx++)
+        {
+            uint otherIdx = particleIndices[indiceIdx];
+            if (idx != otherIdx)
+            {
+                 Particle other = inParticles[otherIdx];
+                 acc += compute_single_acceleration(p, other);
+            }
         }
     }
 

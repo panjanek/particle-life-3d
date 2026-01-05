@@ -131,7 +131,7 @@ namespace ParticleLife3D.Gpu
             var offsetsOk = new int[currentTotalCellsCount];
             DownloadIntBuffer(offsetsOk, cellOffsetBuffer2, currentTotalCellsCount);
             */
-            DebugUtil.DebugSolver(false, config, this);
+            //DebugUtil.DebugSolver(false, config, this);
 
             // ------------------------ run solver --------------------------
             //upload forces
@@ -144,6 +144,9 @@ namespace ParticleLife3D.Gpu
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, pointsBufferB);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, forcesBuffer);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, trackingBuffer);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, cellCountBuffer);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, cellOffsetBuffer2);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 8, particleIndicesBuffer);
 
             GL.UseProgram(solvingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);

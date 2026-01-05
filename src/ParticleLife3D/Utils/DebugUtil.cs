@@ -41,7 +41,9 @@ namespace ParticleLife3D.Utils
             var cellSize = config.cellSize;
 
             List<int>[] expected = new List<int>[config.totalCellCount];
-            for(int idx = 0; idx<config.particleCount; idx++)
+            for(int i=0; i<expected.Length; i++)
+                expected[i] = new List<int>();
+            for (int idx = 0; idx<config.particleCount; idx++)
             {
                 var p = particles[idx];
                 var gridX = p.cellIndex % config.cellCount;
@@ -52,8 +54,6 @@ namespace ParticleLife3D.Utils
                     p.position.Y >= gridY * cellSize && p.position.Y < (gridY + 1) * cellSize &&
                     p.position.Z >= gridZ * cellSize && p.position.Z < (gridZ + 1) * cellSize)
                 {
-                    if (expected[p.cellIndex] == null)
-                        expected[p.cellIndex] = new List<int>();
                     expected[p.cellIndex].Add(idx);
                 }
                 else
