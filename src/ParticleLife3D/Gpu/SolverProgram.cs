@@ -32,6 +32,8 @@ namespace ParticleLife3D.Gpu
 
         private int cellIndicesBuffer;
 
+        private int particleIndicesBuffer;
+
         private int pointsCount;
 
         private int shaderPointStrideSize;
@@ -46,15 +48,10 @@ namespace ParticleLife3D.Gpu
             GL.BufferData(BufferTarget.UniformBuffer, configSizeInBytes, IntPtr.Zero, BufferUsageHint.StaticDraw);
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
 
-            //forces buffer
-            GL.GenBuffers(1, out forcesBuffer);
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, forcesBuffer);
-            GL.BufferData(BufferTarget.ShaderStorageBuffer, Marshal.SizeOf<Vector4>() * Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, IntPtr.Zero, BufferUsageHint.DynamicDraw);
+            //constant-length buffers
+            CreateBuffer(ref forcesBuffer, Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, Marshal.SizeOf<Vector4>());
+            CreateBuffer(ref trackingBuffer, 1, Marshal.SizeOf<Particle>());
 
-            //tracking buffer
-            GL.GenBuffers(1, out trackingBuffer);
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, trackingBuffer);
-            GL.BufferData(BufferTarget.ShaderStorageBuffer, Marshal.SizeOf<Particle>(), IntPtr.Zero, BufferUsageHint.DynamicDraw);
 
             GL.GetInteger((OpenTK.Graphics.OpenGL.GetIndexedPName)All.MaxComputeWorkGroupCount, 0, out maxGroupsX);
             shaderPointStrideSize = Marshal.SizeOf<Particle>();
@@ -68,7 +65,7 @@ namespace ParticleLife3D.Gpu
             if (dispatchGroupsX > maxGroupsX)
                 dispatchGroupsX = maxGroupsX;
 
-            config.cellCount = (int)Math.Ceiling(config.fieldSize / config.maxDist);
+            config.cellCount = (int)Math.Floor(config.fieldSize / config.maxDist);
             config.cellSize = config.fieldSize / config.cellCount;
             config.totalCellCount = config.cellCount * config.cellCount * config.cellCount;
 
@@ -82,6 +79,7 @@ namespace ParticleLife3D.Gpu
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, cellIndicesBuffer);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 11, particleIndicesBuffer);
             GL.UseProgram(tilingProgram);
             GL.DispatchCompute(dispatchGroupsX, 1, 1);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit | MemoryBarrierFlags.ShaderImageAccessBarrierBit);
@@ -165,38 +163,25 @@ namespace ParticleLife3D.Gpu
         {
             if (pointsCount != size)
             {
+                //variable size buffers
                 pointsCount = size;
+                CreateBuffer(ref pointsBufferA, pointsCount, shaderPointStrideSize);
+                CreateBuffer(ref pointsBufferB, pointsCount, shaderPointStrideSize);
+                CreateBuffer(ref cellIndicesBuffer, pointsCount, Marshal.SizeOf<int>());
+                CreateBuffer(ref particleIndicesBuffer, pointsCount, Marshal.SizeOf<int>());
+            }
+        }
 
-                //buffer A
-                if (pointsBufferA > 0)
-                {
-                    GL.DeleteBuffer(pointsBufferA);
-                    pointsBufferA = 0;
-                }
-                GL.GenBuffers(1, out pointsBufferA);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferA);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
-                
-                //buffer B
-                if (pointsBufferB > 0)
-                {
-                    GL.DeleteBuffer(pointsBufferB);
-                    pointsBufferB = 0;
-                }
-                GL.GenBuffers(1, out pointsBufferB);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, pointsBufferB);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * shaderPointStrideSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
-
-                //particle indices
-                if (cellIndicesBuffer > 0)
-                {
-                    GL.DeleteBuffer(cellIndicesBuffer);
-                    cellIndicesBuffer = 0;
-                }
-                GL.GenBuffers(1, out cellIndicesBuffer);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, cellIndicesBuffer);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, pointsCount * Marshal.SizeOf<int>(), IntPtr.Zero, BufferUsageHint.DynamicDraw);
-             }
+        private void CreateBuffer(ref int bufferId, int elementCount, int elementSize)
+        {
+            if (bufferId > 0)
+            {
+                GL.DeleteBuffer(bufferId);
+                bufferId = 0;
+            }
+            GL.GenBuffers(1, out bufferId);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, elementCount * elementSize, IntPtr.Zero, BufferUsageHint.DynamicDraw);
         }
     }
 }

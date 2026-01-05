@@ -50,6 +50,10 @@ layout(std430, binding = 10) buffer CellIndices {
     uint cellIndices[];
 };
 
+layout(std430, binding = 11) buffer ParticleIndices {
+    uint particleIndices[];
+};
+
 int wrapCell(int c)
 {
     return (c % config.cellCount + config.cellCount) % config.cellCount;
@@ -75,5 +79,6 @@ void main()
         int cellIndex = assign_cell(particles[idx].position);
         particles[idx].cellIndex = cellIndex;
         cellIndices[idx] = cellIndex;
+        particleIndices[idx] = idx;
     }
 }
