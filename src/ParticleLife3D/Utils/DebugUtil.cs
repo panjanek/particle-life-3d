@@ -23,7 +23,8 @@ namespace ParticleLife3D.Utils
         public static void DebugSolver(Simulation sim, SolverProgram solver)
         {
             solver.DownloadParticles(sim.particles, true);
-            var cellIndices = solver.DownloadCellIndices();
+            var cellIndices = solver.DownloadIntBuffer(solver.cellIndicesBuffer, sim.config.particleCount);
+            var particleIndices = solver.DownloadIntBuffer(solver.particleIndicesBuffer, sim.config.particleCount);
             var parts = sim.particles;
             var cellSize = sim.config.cellSize;
             for(int idx = 0; idx<sim.config.particleCount; idx++)
@@ -47,6 +48,8 @@ namespace ParticleLife3D.Utils
                 if (p.cellIndex != cellIndices[idx])
                     throw new Exception("bad index");
             }
+
+
 
         }
     }

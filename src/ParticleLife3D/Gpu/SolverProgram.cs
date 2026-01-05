@@ -30,9 +30,9 @@ namespace ParticleLife3D.Gpu
 
         private int trackingBuffer;
 
-        private int cellIndicesBuffer;
+        public int cellIndicesBuffer;
 
-        private int particleIndicesBuffer;
+        public int particleIndicesBuffer;
 
         private int pointsCount;
 
@@ -51,7 +51,6 @@ namespace ParticleLife3D.Gpu
             //constant-length buffers
             CreateBuffer(ref forcesBuffer, Simulation.MaxSpeciesCount * Simulation.MaxSpeciesCount * Simulation.KeypointsCount, Marshal.SizeOf<Vector4>());
             CreateBuffer(ref trackingBuffer, 1, Marshal.SizeOf<Particle>());
-
 
             GL.GetInteger((OpenTK.Graphics.OpenGL.GetIndexedPName)All.MaxComputeWorkGroupCount, 0, out maxGroupsX);
             shaderPointStrideSize = Marshal.SizeOf<Particle>();
@@ -142,15 +141,15 @@ namespace ParticleLife3D.Gpu
             return trackedParticle;
         }
 
-        public int[] DownloadCellIndices()
+        public int[] DownloadIntBuffer(int bufferId, int size)
         {
-            var buffer = new int[pointsCount];
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, cellIndicesBuffer);
+            var buffer = new int[size];
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
 
             GL.GetBufferSubData(
                 BufferTarget.ShaderStorageBuffer,
                 IntPtr.Zero,
-                pointsCount * Marshal.SizeOf<int>(),
+                size * Marshal.SizeOf<int>(),
                 buffer
             );
 
