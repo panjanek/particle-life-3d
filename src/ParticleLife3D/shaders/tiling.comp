@@ -46,11 +46,11 @@ layout(std430, binding = 1) buffer InputBuffer
     Particle particles[];
 };
 
-layout(std430, binding = 10) buffer CellIndices {
+layout(std430, binding = 6) buffer CellIndices {
     uint cellIndices[];
 };
 
-layout(std430, binding = 11) buffer ParticleIndices {
+layout(std430, binding = 7) buffer ParticleIndices {
     uint particleIndices[];
 };
 

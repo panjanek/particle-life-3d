@@ -60,23 +60,23 @@ layout(std430, binding = 5) writeonly buffer TrackingBuffer
     Particle tracked;
 };
 
-layout(std430, binding = 10) buffer CellIndices {
+layout(std430, binding = 6) buffer CellIndices {
     uint particleIndices[];
 };
 
 void torus_pos(inout vec4 pos)
 {
-    if (pos.x > config.fieldSize)
+    if (pos.x >= config.fieldSize)
         pos.x -= config.fieldSize;
     else if (pos.x < 0)
         pos.x += config.fieldSize;
 
-    if (pos.y > config.fieldSize)
+    if (pos.y >= config.fieldSize)
         pos.y -= config.fieldSize;
     else if (pos.y < 0)
         pos.y += config.fieldSize;
 
-    if (pos.z > config.fieldSize)
+    if (pos.z >= config.fieldSize)
         pos.z -= config.fieldSize;
     else if (pos.z < 0)
         pos.z += config.fieldSize;

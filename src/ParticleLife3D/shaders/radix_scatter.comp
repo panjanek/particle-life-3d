@@ -1,13 +1,13 @@
 ﻿#version 430
 layout(local_size_x = {LocalSizeX}) in;
 
-layout(std430, binding = 0) buffer KeysIn    { uint keysIn[];    };
-layout(std430, binding = 1) buffer ValuesIn { uint valsIn[];   };
+layout(std430, binding = 10) buffer KeysIn    { uint keysIn[];    };
+layout(std430, binding = 11) buffer ValuesIn { uint valsIn[];   };
 
-layout(std430, binding = 2) buffer KeysOut  { uint keysOut[];  };
-layout(std430, binding = 3) buffer ValuesOut{ uint valsOut[]; };
+layout(std430, binding = 12) buffer KeysOut  { uint keysOut[];  };
+layout(std430, binding = 13) buffer ValuesOut{ uint valsOut[]; };
 
-layout(std430, binding = 5) buffer Offsets  { uint offsets[]; };
+layout(std430, binding = 15) buffer Offsets  { uint offsets[]; };
 
 uniform uint numElements;
 uniform uint shift;
