@@ -104,11 +104,6 @@ void torus_dist(inout vec4 d)
 
 float evaluateForceForOffset(uint offset, float dist)
 {
-    for(int i=1; i<KEYPOINTS_COUNT; i++)
-        if (forces[i-1].x == forces[i].x)
-            return 0;
-
-
     // Clamp distance to valid range
     dist = clamp(dist, forces[offset].x, forces[offset+5].x);
 
