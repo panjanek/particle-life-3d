@@ -82,7 +82,6 @@ namespace ParticleLife3D.Gpu
             config.totalCellCount = config.cellCount * config.cellCount * config.cellCount;
             PrepareBuffers(config.particleCount, config.totalCellCount);
 
-
             //upload config
             GL.BindBuffer(BufferTarget.UniformBuffer, uboConfig);
             GL.BufferData(BufferTarget.UniformBuffer, Marshal.SizeOf<ShaderConfig>(), ref config, BufferUsageHint.StaticDraw);
@@ -90,13 +89,7 @@ namespace ParticleLife3D.Gpu
             // ------------------------ run tiling ---------------------------
             //count
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, cellCountBuffer);
-            GL.ClearBufferData(
-                BufferTarget.ShaderStorageBuffer,
-                PixelInternalFormat.R32ui,
-                PixelFormat.RedInteger,
-                PixelType.UnsignedInt,
-                IntPtr.Zero
-            );
+            GL.ClearBufferData(BufferTarget.ShaderStorageBuffer, PixelInternalFormat.R32ui, PixelFormat.RedInteger, PixelType.UnsignedInt, IntPtr.Zero);
             GL.BindBufferBase(BufferRangeTarget.UniformBuffer, 0, uboConfig);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, pointsBufferA);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, cellCountBuffer);

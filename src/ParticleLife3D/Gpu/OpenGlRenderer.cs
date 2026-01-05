@@ -29,7 +29,7 @@ namespace ParticleLife3D.Gpu
 
         public const float DirectionChangeSpeed = 0.003f;
 
-        public const int TorusRepeats = 3;
+        public const int TorusRepeats = 2;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }

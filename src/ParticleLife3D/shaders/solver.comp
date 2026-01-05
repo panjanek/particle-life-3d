@@ -146,8 +146,8 @@ vec4 compute_single_acceleration(Particle p, Particle other)
     return single_acc;
 }
 
-/*
-vec4 compute_total_acceleration(uint idx, Particle p)
+
+vec4 compute_total_acceleration0(uint idx, Particle p)
 {
     vec4 acc = vec4(0.0);
     for(uint otherIdx = 0; otherIdx < config.particleCount; otherIdx++)
@@ -160,7 +160,7 @@ vec4 compute_total_acceleration(uint idx, Particle p)
     }
 
     return acc;
-}*/
+}
 
 int wrapCell(int c)
 {
@@ -169,9 +169,10 @@ int wrapCell(int c)
 
 vec4 compute_total_acceleration(uint idx, Particle p)
 {
+    int cellCount2 = config.cellCount * config.cellCount;
     int gridX = p.cellIndex % config.cellCount;
     int gridY = (p.cellIndex / config.cellCount) % config.cellCount;
-    int gridZ = p.cellIndex / (config.cellCount * config.cellCount);
+    int gridZ = p.cellIndex / (cellCount2);
     ivec3 main = ivec3(gridX, gridY, gridZ);
 
     vec4 acc = vec4(0.0);
@@ -185,7 +186,7 @@ vec4 compute_total_acceleration(uint idx, Particle p)
         cell.z = wrapCell(cell.z);
         uint cellIdx = cell.x +
                        cell.y * config.cellCount +
-                       cell.z * config.cellCount * config.cellCount;
+                       cell.z * cellCount2;
         uint offset = cellOffsets[cellIdx];
         uint count = cellCounts[cellIdx];
         for(uint indiceIdx = offset; indiceIdx<offset + count; indiceIdx++)
