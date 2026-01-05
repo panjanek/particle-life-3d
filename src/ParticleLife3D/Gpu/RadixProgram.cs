@@ -63,13 +63,12 @@ namespace ParticleLife3D.Gpu
 
         public void Run(ShaderConfig config, int cellIndicesBuffer)
         {
-            PrepareBuffers(config.particleCount);
             int dispatchGroupsX = (currentParticlesCount + ShaderUtil.LocalSizeX - 1) / ShaderUtil.LocalSizeX;
             if (dispatchGroupsX > maxGroupsX)
                 dispatchGroupsX = maxGroupsX;
 
             GL.CopyNamedBufferSubData(cellIndicesBuffer, keysA, IntPtr.Zero, IntPtr.Zero, currentParticlesCount * sizeof(uint));
-            
+            GL.MemoryBarrier(MemoryBarrierFlags.BufferUpdateBarrierBit);
 
             int inKeys = keysA, outKeys = keysB;
             int inVals = valsA, outVals = valsB;
@@ -88,19 +87,20 @@ namespace ParticleLife3D.Gpu
 
                 // ---- 2) Histogram pass ----
                 GL.UseProgram(histogramProgram);
-                GL.Uniform1(histNumElementsLoc, config.particleCount);
-                GL.Uniform1(histShiftLoc, shift);
+
 
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, inKeys);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 14, histogram);
 
                 var testInKeys = DownloadIntBuffer(inKeys, currentParticlesCount);
+                var testinVals = DownloadIntBuffer(inVals, currentParticlesCount);
 
+                GL.Uniform1(histNumElementsLoc, (uint)config.particleCount);
+                GL.Uniform1(histShiftLoc, (uint)shift);
                 GL.DispatchCompute(dispatchGroupsX, 1, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
 
                 var testHistogram = DownloadIntBuffer(histogram, 16);
-                var testOffsets = DownloadIntBuffer(offsets, 16);
 
                 // ---- 3) Prefix sum pass ----
                 GL.UseProgram(prefixsumProgram);
@@ -110,10 +110,13 @@ namespace ParticleLife3D.Gpu
                 GL.DispatchCompute(1, 1, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
 
+                var testHistogram2 = DownloadIntBuffer(histogram, 16);
+                var testOffsets = DownloadIntBuffer(offsets, 16);
+
                 // ---- 4) Scatter pass ----
                 GL.UseProgram(scatterProgram);
-                GL.Uniform1(scatterNumElementsLoc, config.particleCount);
-                GL.Uniform1(scatterShiftLoc, shift);
+                GL.Uniform1(scatterNumElementsLoc, (uint)config.particleCount);
+                GL.Uniform1(scatterShiftLoc, (uint)shift);
 
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 10, inKeys);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 11, inVals);
@@ -123,6 +126,9 @@ namespace ParticleLife3D.Gpu
 
                 GL.DispatchCompute(dispatchGroupsX, 1, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
+
+                var testOutKeys = DownloadIntBuffer(outKeys, config.particleCount);
+                var testOutVals = DownloadIntBuffer(outVals, config.particleCount);
 
                 // ---- swap ping-pong ----
                 (inKeys, outKeys) = (outKeys, inKeys);
