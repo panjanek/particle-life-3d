@@ -95,6 +95,18 @@ namespace ParticleLife3D.Models
             forces[offset + 5] = new Vector4(5*d, 0, 0, 0);
         }
 
+        private void SetSimpleForce(int specMe, int specOther, float val0, float val1)
+        {
+            int offset = GetForceOffset(specMe, specOther);
+            var d = config.maxDist / 6;
+            forces[offset + 0] = new Vector4(0 * d, val0, 0, 0);
+            forces[offset + 1] = new Vector4(1 * d, 0, 0, 0);
+            forces[offset + 2] = new Vector4(2 * d, val1, 0, 0);
+            forces[offset + 3] = new Vector4(3 * d, 0, 0, 0);
+            forces[offset + 4] = new Vector4(4 * d, 0, 0, 0);
+            forces[offset + 5] = new Vector4(5 * d, 0, 0, 0);
+        }
+
         public void InitializeRandomForces()
         {
             var rnd = new Random(seed); //4
@@ -109,9 +121,16 @@ namespace ParticleLife3D.Models
 
         public void InitialOneForceAtRandom(int i, int j, Random rnd)
         {
+            /*
             float v1 = (float)(1.7 * config.maxForce * (rnd.NextDouble() - 0.5));
             float v2 = (float)(1 * config.maxForce * (rnd.NextDouble() - 0.5));
             SetForce(i, j, -config.maxForce * 0.5f, v1, v2);
+            */
+
+            float m = config.maxForce;
+            var rep = -0.5f * m;
+            var main = (float)(0.25 * m * (rnd.NextDouble() - 0.5));
+            SetSimpleForce(i, j, rep, main);
         }
 
         public void InitializeParticles(int count)
