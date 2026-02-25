@@ -31,6 +31,8 @@ namespace ParticleLife3D
 
         private AppContext app;
 
+        private FullscreenWindow fullscreen;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -75,6 +77,28 @@ namespace ParticleLife3D
                     app.renderer.StopTracking();
                     e.Handled = true;
                     break;
+                case Key.F:
+                    ToggleFullscreen();
+                    break;
+            }
+        }
+
+        private void ToggleFullscreen()
+        {
+            if (fullscreen == null)
+            {
+                parent.Children.Remove(placeholder);
+                fullscreen = new FullscreenWindow() { Owner = Window.GetWindow(this) };
+                fullscreen.KeyDown += MainWindow_KeyDown;
+                fullscreen.ContentHost.Content = placeholder;
+                fullscreen.Show();
+            }
+            else
+            {
+                fullscreen.ContentHost.Content = null;
+                parent.Children.Add(placeholder);
+                fullscreen.Close();
+                fullscreen = null;
             }
         }
 

@@ -337,7 +337,16 @@ namespace ParticleLife3D.Gpu
                 solverProgram.Run(ref app.simulation.config, app.simulation.forces);
             }
 
-            glControl.Invalidate();
+            var recDir = app.configWindow.recordDir?.ToString();
+            if (string.IsNullOrWhiteSpace(recDir))
+            {
+                glControl.Invalidate();
+            }
+            else
+            {
+                GL.Finish();
+                GlControl_Paint(null, null);
+            }
         }
 
         private void Capture()
