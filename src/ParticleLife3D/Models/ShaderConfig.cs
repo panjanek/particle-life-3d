@@ -17,7 +17,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(0)] public int particleCount = 0;
 
-        [FieldOffset(4)] public float dt = 0.05f;
+        [FieldOffset(4)] public float dt = 0.025f;
 
         [FieldOffset(8)] public float sigma2 = 0f;
 

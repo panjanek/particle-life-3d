@@ -31,7 +31,7 @@ namespace ParticleLife3D.Models
 
         public int seed = 11;
 
-        public float followDistance = 150; 
+        public float followDistance = 75; 
 
         //this is for json serialization
         public float[][] F
@@ -130,6 +130,13 @@ namespace ParticleLife3D.Models
             float m = config.maxForce;
             var rep = -0.5f * m;
             var main = (float)(0.25 * m * (rnd.NextDouble() - 0.5));
+
+            var delta = (i - j + config.speciesCount) % config.speciesCount;
+            if (delta > 1)
+                main = 0;
+
+
+
             SetSimpleForce(i, j, rep, main);
         }
 
