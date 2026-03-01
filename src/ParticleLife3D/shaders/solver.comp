@@ -9,7 +9,7 @@ struct ShaderConfig {
     float dt;
     float sensorDist;
     float t;
-    float clampAcc;
+    float randomization;
     float fieldSize;
     float cellSize;
     float maxDist;
@@ -76,6 +76,37 @@ layout(std430, binding = 7) buffer CellOffsets {
 layout(std430, binding = 8) buffer ParticleIndices {
     uint particleIndices[];
 };
+
+uint hash(uint state)
+{
+    state ^= 2747636419u;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    state ^= state >> 16;
+    state *= 2654435769u;
+    return state;
+}
+
+float scaleToRange01(uint state)
+{
+    return state / 4294967295.0;
+}
+
+float get_random_float_01(Particle p, uint seed)
+{
+     uint random = hash(uint(p.position.y * config.fieldSize + p.position.x) + hash(gl_GlobalInvocationID.x + int(config.t) * seed));
+     float random01 = scaleToRange01(random);
+     return random01;
+}
+
+vec4 get_random_01_vec4(Particle p)
+{
+    float x = get_random_float_01(p, 100037);
+    float y = get_random_float_01(p, 2045);
+    float z = get_random_float_01(p, 31347);
+    return vec4(x,y,z,0);
+}
 
 void torus_pos(inout vec4 pos)
 {
@@ -194,25 +225,28 @@ void update_one(uint idx)
     vec4 pos = p.position;
     vec4 dir = p.direction;
 
+    //compute force acting on a sensor
     vec4 sensorPos = pos + config.sensorDist * dir;
-
     vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
+    //apply torque to the particle
     vec3 d = dir.xyz;
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
     d = normalize(d + config.torque_k * a_perp * config.dt);
-
     dir = vec4(d, 0);
-    vel = dir * config.velocity;
 
+    //randomization
+    vec4 random = get_random_01_vec4(p);
+    dir += (random - 0.5) * config.randomization;
+    dir = normalize(dir);
 
     //integrate position
+    vel = dir * config.velocity;
     pos += vel * config.dt;
 
-    torus_pos(pos);
-
     //prepare updated particle struct
+    torus_pos(pos);
     p.direction = dir;
     p.position = pos;
     p.velocity = vel;

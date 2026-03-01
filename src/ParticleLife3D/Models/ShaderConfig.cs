@@ -23,7 +23,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(12)] public float t = 0;
 
-        [FieldOffset(16)] public float clampAcc = 0;
+        [FieldOffset(16)] public float randomization = 0.1f;
 
         [FieldOffset(20)] public float fieldSize = 800;
 
@@ -33,7 +33,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(32)] public int speciesCount = 0;
 
-        [FieldOffset(36)] public float velocity = 3f;
+        [FieldOffset(36)] public float velocity = 15f;
 
         [FieldOffset(40)] public int trackedIdx;
 
