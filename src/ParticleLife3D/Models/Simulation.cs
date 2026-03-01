@@ -98,13 +98,9 @@ namespace ParticleLife3D.Models
         private void SetSimpleForce(int specMe, int specOther, float val0, float val1)
         {
             int offset = GetForceOffset(specMe, specOther);
-            var d = config.maxDist / KeypointsCount;
-            forces[offset + 0] = new Vector4(0 * d, val0, 0, 0);
-            forces[offset + 1] = new Vector4(1 * d, 0, 0, 0);
-            forces[offset + 2] = new Vector4(2 * d, val1, 0, 0);
-            forces[offset + 3] = new Vector4(3 * d, 0, 0, 0);
-            forces[offset + 4] = new Vector4(4 * d, 0, 0, 0);
-            forces[offset + 5] = new Vector4(5 * d, 0, 0, 0);
+            forces[offset + 0] = new Vector4(0, val0, 0, 0);
+            forces[offset + 1] = new Vector4(config.maxDist*0.75f, 0, 0, 0);
+            forces[offset + 2] = new Vector4(config.maxDist, val1, 0, 0);
         }
 
         public void InitializeRandomForces()
@@ -128,18 +124,11 @@ namespace ParticleLife3D.Models
             */
 
             float m = config.maxForce;
-            var rep = -0.5f * m;
-            var main = (float)(0.25 * m * (rnd.NextDouble() - 0.5));
 
-            var delta = (i - j + config.speciesCount) % config.speciesCount;
-            if (delta > 1)
-                main = 0;
-
-
-
-            SetSimpleForce(i, j, rep, main);
-
-            SetSimpleForce(i, j, 0.5f * m, 0);
+            if (i==j)
+                SetSimpleForce(i, j, 0.5f * m, 0);
+            else
+                SetSimpleForce(i, j, -0.1f * m, 0);
         }
 
         public void InitializeParticles(int count)

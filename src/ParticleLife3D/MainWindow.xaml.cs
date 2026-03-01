@@ -18,9 +18,10 @@ using Application = System.Windows.Application;
 
 namespace ParticleLife3D
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    // steerTreshold
+    // steerClamp
+    // fogDensity
+    // cameraAutoMove
     public partial class MainWindow : Window
     {
         private bool uiPending;
