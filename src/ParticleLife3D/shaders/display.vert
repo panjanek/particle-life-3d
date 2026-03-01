@@ -36,9 +36,10 @@ void main()
     vec4 viewPos = view * vec4(p.position.xyz, 1.0);
     gl_Position = projection * viewPos;
 
-    float distance = -viewPos.z; 
-    gl_PointSize = paricleSize / distance;
+    float distance = max(-viewPos.z, 0.001);
 
+    float scale = projection[1][1];
+    gl_PointSize = paricleSize * scale / distance;
 
     const vec3 colors[] = vec3[](
         vec3(0.0, 1.0, 0.0), // green
@@ -55,4 +56,7 @@ void main()
 
     float fogDensity = 0.0005;    
     vFadingAlpha = exp(-fogDensity * distance);
+
+    //gl_Position = vec4(0,0,0,1);
+    //gl_PointSize = 20.0;
 }

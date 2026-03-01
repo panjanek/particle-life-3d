@@ -20,5 +20,4 @@ void main()
     alpha *= vFadingAlpha;
 
     outputColor = vec4(vColor * alpha, alpha);
-    //outputColor = vec4(1,1,1,1);
 }

@@ -22,12 +22,7 @@ namespace ParticleLife3D.Gpu
 
         private int torusOffsetLocation;
 
-        private int quadVao;
-
-        private int quadVbo;
-
-        private int quadEbo;
-
+        private int dummyVao;
 
         public DisplayProgram()
         {
@@ -41,80 +36,29 @@ namespace ParticleLife3D.Gpu
             torusOffsetLocation = GL.GetUniformLocation(program, "torusOffset");
             if (torusOffsetLocation == -1) throw new Exception("Uniform 'torusOffset' not found. Shader optimized it out?");
 
-            float[] quad =
-                {
-                    -1, -1,
-                     1, -1,
-                     1,  1,
-                    -1,  1
-                };
-
-            uint[] indices = { 0, 1, 2, 2, 3, 0 };
-
-            quadVao = GL.GenVertexArray();
-            quadVbo = GL.GenBuffer();
-            quadEbo = GL.GenBuffer();
-
-            GL.BindVertexArray(quadVao);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, quadVbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, quad.Length * sizeof(float), quad, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(5, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(5);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, quadEbo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
-
+            dummyVao = GL.GenVertexArray();
             GL.BindVertexArray(0);
+        }
 
-            /* original
+        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets, Vector4 trackedPos)
+        {
             GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Less);
-            GL.DepthMask(true);
-
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(
-                BlendingFactor.SrcAlpha,
-                BlendingFactor.OneMinusSrcAlpha
-            );
-            */
-
-            /* working
-            
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Less);
-            GL.DepthMask(false);   // IMPORTANT: do NOT write depth
-
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(
-                BlendingFactor.SrcAlpha,
-                BlendingFactor.One    // additive blending
-            );
-
-            GL.Disable(EnableCap.DepthTest);
-            */
-
-            GL.Disable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Lequal);
+            GL.DepthMask(true);
+            GL.Clear(
+                ClearBufferMask.ColorBufferBit |
+                ClearBufferMask.DepthBufferBit
+            );
             GL.DepthMask(false);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha,
                          BlendingFactor.One);
 
-        }
-
-        public void Run(Matrix4 projectionMatrix, int particlesCount, float particleSize, Vector2 viewportSize, Matrix4 view, List<Vector4> torusOffsets, Vector4 trackedPos)
-        {
-            GL.Clear(
-                ClearBufferMask.ColorBufferBit |
-                ClearBufferMask.DepthBufferBit
-            );
             foreach (var torusOffset in torusOffsets)
             {
                 GL.UseProgram(program);
-                GL.BindVertexArray(quadVao);
+                GL.BindVertexArray(dummyVao);
 
                 GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
                 GL.Uniform1(particleSizeLocation, particleSize);

@@ -71,10 +71,11 @@ namespace ParticleLife3D.Gpu
             glControl = new GLControl(new GLControlSettings
             {
                 API = OpenTK.Windowing.Common.ContextAPI.OpenGL,
-                APIVersion = new Version(3, 3), // OpenGL 3.3
-                Profile = ContextProfile.Compatability,
+                APIVersion = new Version(4, 3), 
+                Profile = ContextProfile.Core,
                 Flags = ContextFlags.Default,
-                IsEventDriven = false
+                IsEventDriven = false,
+                DepthBits = 24
             });
             glControl.Dock = DockStyle.Fill;
             host.Child = glControl;
