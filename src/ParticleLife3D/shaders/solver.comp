@@ -7,17 +7,17 @@ layout(local_size_x = {LocalSizeX}) in;
 struct ShaderConfig {
     int particleCount;
     float dt;
-    float sigma2;
-    float clampVel;
+    float sensorDist;
+    float t;
     float clampAcc;
     float fieldSize;
     float cellSize;
     float maxDist;
     int speciesCount;
-    float damping;
+    float velocity;
     int trackedIdx;
     float maxForce;
-    float amp;
+    float torque_k;
     int cellCount;
     int totalCellCount;
     ivec4 disabled[4];
@@ -39,7 +39,7 @@ struct Particle
 };
 
 #define MAX_SPECIES_COUNT     10
-#define KEYPOINTS_COUNT       6
+#define KEYPOINTS_COUNT       3
 #define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
 
 layout(std140, binding = 0) uniform ConfigBuffer {
@@ -136,11 +136,11 @@ vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
     vec4 single_acc = vec4(0,0,0,0);
     if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
     {
-        float r2 = dot(d, d) + config.sigma2;
+        float r2 = dot(d, d);
         float r = sqrt(r2);
         uint forceOffset = (p.species * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
         float f = evaluateForceForOffset(forceOffset, r);
-        single_acc = config.amp * f * d / r;
+        single_acc = f * d / r;
     }
 
     return single_acc;
@@ -194,20 +194,17 @@ void update_one(uint idx)
     vec4 pos = p.position;
     vec4 dir = p.direction;
 
-    vec4 sensorPos = pos + 15 * dir;
+    vec4 sensorPos = pos + config.sensorDist * dir;
 
     vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
     vec3 d = dir.xyz;
-
-    float k = 0.3;
-
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
-    d = normalize(d + k * a_perp * config.dt);
+    d = normalize(d + config.torque_k * a_perp * config.dt);
 
     dir = vec4(d, 0);
-    vel = dir * 3;
+    vel = dir * config.velocity;
 
 
     //integrate position

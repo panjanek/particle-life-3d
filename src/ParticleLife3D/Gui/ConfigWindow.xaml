@@ -168,19 +168,19 @@
                 <Slider Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.001" Maximum="0.1" SmallChange="0.001" LargeChange="0.01" ValueChanged="Slider_ValueChanged" Tag="config.dt" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="4" Grid.Column="2" Tag="config.dt"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- damping -->
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="damping ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Integration step"/>
-                <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.001" Maximum="2" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.damping" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="5" Grid.Column="2" Tag="config.damping"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <!-- velocity -->
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Velocity ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Velocity"/>
+                <Slider Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="50.0" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="config.velocity" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="5" Grid.Column="2" Tag="config.velocity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- amp -->
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="Force amplification ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Global force amplification"/>
-                <Slider Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="10" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.amp" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="6" Grid.Column="2" Tag="config.amp"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <!-- Torque -->
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Torque ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Torque"/>
+                <Slider Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.01" Maximum="2" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.torque_k" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="6" Grid.Column="2" Tag="config.torque_k"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- maxDist -->
                 <TextBlock Grid.Row="7" Grid.Column="0" Text="Max force distance ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Maximum dostance between particles for computing forces. Beyond tht the interaction is ignored"/>
-                <Slider Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="1000" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" Tag="config.maxDist" VerticalAlignment="Center"/>
+                <Slider Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="150" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="config.maxDist" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="7" Grid.Column="2" Tag="config.maxDist"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- maxForce -->
@@ -198,10 +198,10 @@
                 <Slider Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="10" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="10" Grid.Column="2" Tag="particleSize"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- followDistance -->
-                <TextBlock Grid.Row="11" Grid.Column="0" Text="Follow distance ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="How far of the followd particle the camera is adter right click on particle"/>
-                <Slider Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="1" Minimum="10" Maximum="1000" SmallChange="10" LargeChange="50" ValueChanged="Slider_ValueChanged" Tag="followDistance" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="11" Grid.Column="2" Tag="followDistance"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <!-- sensor Distance -->
+                <TextBlock Grid.Row="11" Grid.Column="0" Text="Sensor distance ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Front sensor of an agent"/>
+                <Slider Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="100" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="config.sensorDist" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="11" Grid.Column="2" Tag="config.sensorDist"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 
                 <!-- forces -->

@@ -15,7 +15,7 @@ namespace ParticleLife3D.Models
     {
         public const int MaxSpeciesCount = 10;
 
-        public const int KeypointsCount = 6;
+        public const int KeypointsCount = 3;
 
         public ShaderConfig config;
 
@@ -86,7 +86,7 @@ namespace ParticleLife3D.Models
         private void SetForce(int specMe, int specOther, float val0, float val1, float val2)
         {
             int offset = GetForceOffset(specMe, specOther);
-            var d = config.maxDist / 6;
+            var d = config.maxDist / KeypointsCount;
             forces[offset + 0] = new Vector4(0, val0, 0, 0);
             forces[offset + 1] = new Vector4(d, 0, 0, 0);
             forces[offset + 2] = new Vector4(2*d, val1, 0, 0);
@@ -98,7 +98,7 @@ namespace ParticleLife3D.Models
         private void SetSimpleForce(int specMe, int specOther, float val0, float val1)
         {
             int offset = GetForceOffset(specMe, specOther);
-            var d = config.maxDist / 6;
+            var d = config.maxDist / KeypointsCount;
             forces[offset + 0] = new Vector4(0 * d, val0, 0, 0);
             forces[offset + 1] = new Vector4(1 * d, 0, 0, 0);
             forces[offset + 2] = new Vector4(2 * d, val1, 0, 0);
@@ -139,7 +139,7 @@ namespace ParticleLife3D.Models
 
             SetSimpleForce(i, j, rep, main);
 
-            SetSimpleForce(i, j, 0.5f * m, 0.7f * m);
+            SetSimpleForce(i, j, 0.5f * m, 0);
         }
 
         public void InitializeParticles(int count)
