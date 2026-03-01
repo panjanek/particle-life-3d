@@ -76,9 +76,9 @@ void main()
 
     // species coloring as before
         const vec3 colors[] = vec3[](
-        vec3(1.0, 0.0, 0.0), // red
         vec3(0.0, 1.0, 0.0), // green
         vec3(0.0, 0.0, 1.0), // blue
+        vec3(1.0, 0.0, 0.0), // red
         vec3(1.0, 1.0, 0.0), // yellow
         vec3(1.0, 0.0, 1.0), // magenta
         vec3(0.0, 1.0, 1.0), // cyan
