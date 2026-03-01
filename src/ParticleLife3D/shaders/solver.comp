@@ -30,7 +30,11 @@ struct Particle
    int species;
    int flags;
    int  cellIndex;
-   int  _pad1;
+   float xzAngle;
+   float yAngle;
+   int _pad0;
+   int _pad1;
+   int _pad2;
 };
 
 #define MAX_SPECIES_COUNT     10
@@ -124,9 +128,9 @@ float evaluateForceForOffset(uint offset, float dist)
     return 0.0;
 }
 
-vec4 compute_single_acceleration(Particle p, Particle other)
+vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
 {
-    vec4 d = other.position - p.position;
+    vec4 d = other.position - sensorPos; 
     torus_dist(d);
     vec4 single_acc = vec4(0,0,0,0);
     if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
@@ -141,7 +145,7 @@ vec4 compute_single_acceleration(Particle p, Particle other)
     return single_acc;
 }
 
-
+/*
 vec4 compute_total_acceleration0(uint idx, Particle p)
 {
     vec4 acc = vec4(0.0);
@@ -156,13 +160,14 @@ vec4 compute_total_acceleration0(uint idx, Particle p)
 
     return acc;
 }
+*/
 
 int wrapCell(int c)
 {
     return (c % config.cellCount + config.cellCount) % config.cellCount;
 }
 
-vec4 compute_total_acceleration(uint idx, Particle p)
+vec4 compute_total_acceleration(vec4 sensorPos, uint idx, Particle p)
 {
     int cellCount2 = config.cellCount * config.cellCount;
     int gridX = p.cellIndex % config.cellCount;
@@ -190,7 +195,7 @@ vec4 compute_total_acceleration(uint idx, Particle p)
             if (idx != otherIdx)
             {
                  Particle other = inParticles[otherIdx];
-                 acc += compute_single_acceleration(p, other);
+                 acc += compute_single_acceleration(sensorPos, p, other);
             }
         }
     }
@@ -202,9 +207,19 @@ void update_one(uint idx)
 {
     Particle p = inParticles[idx];
     
-    vec4 acc = compute_total_acceleration(idx, p);
+    
     vec4 vel = p.velocity;
     vec4 pos = p.position;
+    float xzAngle = p.xzAngle;
+    float yAngle = p.yAngle;
+    vec4 sensorDir = vec4(0);
+    sensorDir.x = cos(yAngle) * sin(xzAngle);
+    sensorDir.y = sin(yAngle);
+    sensorDir.z = cos(yAngle) * cos(xzAngle);
+    sensorDir = normalize(sensorDir);
+    vec4 sensorPos = pos + 5 * sensorDir;
+
+    vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
     //clamp acceleration
     if (config.clampAcc > 0.0)
@@ -229,6 +244,13 @@ void update_one(uint idx)
     float speed = length(vel);
     float drag = exp(-config.damping * speed * config.dt);
     vel *= drag;
+
+
+    vel.x = cos(yAngle) * sin(xzAngle);
+    vel.y = sin(yAngle);
+    vel.z = cos(yAngle) * cos(xzAngle);
+
+
 
     //integrate position
     pos += vel * config.dt;

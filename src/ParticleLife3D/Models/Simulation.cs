@@ -157,6 +157,9 @@ namespace ParticleLife3D.Models
                                                     (float)(100 * config.dt * (rnd.NextDouble() - 0.5)),
                                                     0);
                 particles[i].species = rnd.Next(config.speciesCount);
+
+                particles[i].xzAngle = (float)(rnd.NextDouble() * 2 * Math.PI);
+                particles[i].yAngle = (float)((0.5 - rnd.NextDouble())*Math.PI);
             }
         }
     }

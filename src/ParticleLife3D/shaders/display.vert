@@ -7,7 +7,11 @@ struct Particle
    int species;
    int flags;
    int  cellIndex;
-   int  _pad1;
+   float xzAngle;
+   float yAngle;
+   int _pad0;
+   int _pad1;
+   int _pad2;
 };
 
 layout(std430, binding = 2) buffer OutputBuffer {

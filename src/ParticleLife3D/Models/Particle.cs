@@ -16,6 +16,10 @@ namespace ParticleLife3D.Models
         public int species;
         public int flags;
         public int cellIndex;
-        private int _pad1;
+        public float xzAngle;
+        public float yAngle;
+        public int _pad0;
+        public int _pad1;
+        public int _pad2;
     }
 }

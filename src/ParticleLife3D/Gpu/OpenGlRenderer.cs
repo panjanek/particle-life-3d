@@ -249,7 +249,7 @@ namespace ParticleLife3D.Gpu
             }
             else
             {
-                center += new Vector4(0, 0, 0.15f, 0);
+                //center += new Vector4(0, 0, 0.15f, 0);
             }
             center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
         }
