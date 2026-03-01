@@ -138,6 +138,8 @@ namespace ParticleLife3D.Models
 
 
             SetSimpleForce(i, j, rep, main);
+
+            SetSimpleForce(i, j, 0.5f * m, 0.7f * m);
         }
 
         public void InitializeParticles(int count)

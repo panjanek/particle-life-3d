@@ -145,23 +145,6 @@ vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
     return single_acc;
 }
 
-/*
-vec4 compute_total_acceleration0(uint idx, Particle p)
-{
-    vec4 acc = vec4(0.0);
-    for(uint otherIdx = 0; otherIdx < config.particleCount; otherIdx++)
-    {
-        if (idx != otherIdx)
-        {
-             Particle other = inParticles[otherIdx];
-             acc += compute_single_acceleration(p, other);
-        }
-    }
-
-    return acc;
-}
-*/
-
 int wrapCell(int c)
 {
     return (c % config.cellCount + config.cellCount) % config.cellCount;
@@ -217,33 +200,24 @@ void update_one(uint idx)
     sensorDir.y = sin(yAngle);
     sensorDir.z = cos(yAngle) * cos(xzAngle);
     sensorDir = normalize(sensorDir);
-    vec4 sensorPos = pos + 5 * sensorDir;
+    vec4 sensorPos = pos + 15 * sensorDir;
 
     vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
-    //clamp acceleration
-    if (config.clampAcc > 0.0)
-    {
-        float acc2 = dot(acc, acc);
-        float maxAcc2 = config.clampAcc * config.clampAcc;
-        acc *= inversesqrt(max(acc2, maxAcc2)) * config.clampAcc;
-    }
+    vec3 direction = vec3(0);
+    direction.x = cos(yAngle) * sin(xzAngle);
+    direction.y = sin(yAngle);
+    direction.z = cos(yAngle) * cos(xzAngle);
+    vec3 d = normalize(direction);
 
-    //integrate velocity
-    vel += acc * config.dt;
-    
-    //clamp velocity
-    if (config.clampVel > 0)
-    {
-        float vel2 = dot(vel, vel);
-        float maxVel2 = config.clampVel * config.clampVel;
-        vel *= inversesqrt(max(vel2, maxVel2)) * config.clampVel;
-    }
+    float k = 0.1;
 
-    //exp drag
-    float speed = length(vel);
-    float drag = exp(-config.damping * speed * config.dt);
-    vel *= drag;
+    vec3 a = acc.xyz;
+    vec3 a_perp = a - d * dot(d, a);
+    d = normalize(d + k * a_perp * config.dt);
+
+    xzAngle = atan(d.x, d.z);
+    yAngle  = atan(d.y, length(vec2(d.x, d.z)));
 
 
     vel.x = cos(yAngle) * sin(xzAngle);
@@ -258,6 +232,8 @@ void update_one(uint idx)
     torus_pos(pos);
 
     //prepare updated particle struct
+    p.xzAngle = xzAngle;
+    p.yAngle = yAngle;
     p.position = pos;
     p.velocity = vel;
     p.flags = 0;
