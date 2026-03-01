@@ -154,14 +154,17 @@ namespace ParticleLife3D.Models
                                                     (float)(config.fieldSize * rnd.NextDouble()),
                                                     (float)(config.fieldSize * rnd.NextDouble()),
                                                     0);
-                particles[i].velocity = new Vector4((float)(100 * config.dt * (rnd.NextDouble()-0.5)), 
-                                                    (float)(100 * config.dt * (rnd.NextDouble()-0.5)),
-                                                    (float)(100 * config.dt * (rnd.NextDouble() - 0.5)),
-                                                    0);
                 particles[i].species = rnd.Next(config.speciesCount);
 
                 particles[i].xzAngle = (float)(rnd.NextDouble() * 2 * Math.PI);
                 particles[i].yAngle = (float)((0.5 - rnd.NextDouble())*Math.PI);
+
+                float dirX = (float)(Math.Cos(particles[i].yAngle) * Math.Sin(particles[i].xzAngle));
+                float dirY = (float)(Math.Sin(particles[i].yAngle));
+                float dirZ = (float)(Math.Cos(particles[i].yAngle) * Math.Cos(particles[i].xzAngle));
+                var dir = new Vector4(dirX, dirY, dirZ, 0);
+                dir.Normalize();
+                particles[i].direction = dir;
             }
         }
     }

@@ -12,6 +12,7 @@ struct Particle
    int _pad0;
    int _pad1;
    int _pad2;
+   vec4 direction;
 };
 
 layout(std430, binding = 2) buffer OutputBuffer {

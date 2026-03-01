@@ -35,6 +35,7 @@ struct Particle
    int _pad0;
    int _pad1;
    int _pad2;
+   vec4 direction;
 };
 
 #define MAX_SPECIES_COUNT     10
@@ -188,42 +189,25 @@ vec4 compute_total_acceleration(vec4 sensorPos, uint idx, Particle p)
 
 void update_one(uint idx)
 {
-    Particle p = inParticles[idx];
-    
-    
+    Particle p = inParticles[idx];    
     vec4 vel = p.velocity;
     vec4 pos = p.position;
-    float xzAngle = p.xzAngle;
-    float yAngle = p.yAngle;
-    vec4 sensorDir = vec4(0);
-    sensorDir.x = cos(yAngle) * sin(xzAngle);
-    sensorDir.y = sin(yAngle);
-    sensorDir.z = cos(yAngle) * cos(xzAngle);
-    sensorDir = normalize(sensorDir);
-    vec4 sensorPos = pos + 15 * sensorDir;
+    vec4 dir = p.direction;
+
+    vec4 sensorPos = pos + 15 * dir;
 
     vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
-    vec3 direction = vec3(0);
-    direction.x = cos(yAngle) * sin(xzAngle);
-    direction.y = sin(yAngle);
-    direction.z = cos(yAngle) * cos(xzAngle);
-    vec3 d = normalize(direction);
+    vec3 d = dir.xyz;
 
-    float k = 0.1;
+    float k = 0.3;
 
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
     d = normalize(d + k * a_perp * config.dt);
 
-    xzAngle = atan(d.x, d.z);
-    yAngle  = atan(d.y, length(vec2(d.x, d.z)));
-
-
-    vel.x = cos(yAngle) * sin(xzAngle);
-    vel.y = sin(yAngle);
-    vel.z = cos(yAngle) * cos(xzAngle);
-
+    dir = vec4(d, 0);
+    vel = dir * 3;
 
 
     //integrate position
@@ -232,8 +216,7 @@ void update_one(uint idx)
     torus_pos(pos);
 
     //prepare updated particle struct
-    p.xzAngle = xzAngle;
-    p.yAngle = yAngle;
+    p.direction = dir;
     p.position = pos;
     p.velocity = vel;
     p.flags = 0;

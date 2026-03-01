@@ -21,5 +21,6 @@ namespace ParticleLife3D.Models
         public int _pad0;
         public int _pad1;
         public int _pad2;
+        public Vector4 direction;
     }
 }
