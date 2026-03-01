@@ -54,9 +54,6 @@ void main()
 
     vColor = colors[p.species % 8];
 
-    float fogDensity = 0.0005;    
+    float fogDensity = 0.001;    
     vFadingAlpha = exp(-fogDensity * distance);
-
-    //gl_Position = vec4(0,0,0,1);
-    //gl_PointSize = 20.0;
 }

@@ -229,20 +229,33 @@ void update_one(uint idx)
     vec4 sensorPos = pos + config.sensorDist * dir;
     vec4 acc = compute_total_acceleration(sensorPos, idx, p);
 
-    //apply torque to the particle
+    // apply torque
     vec3 d = dir.xyz;
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
-    d = normalize(d + config.torque_k * a_perp * config.dt);
-    dir = vec4(d, 0);
+    float perpMag = length(a_perp);
+    if (perpMag > 0.01)
+    {
+        vec3 steer = a_perp;
+        float maxSteer = 1.0;
+
+        if (perpMag > maxSteer)
+            steer *= maxSteer / perpMag;
+
+        //float saturatedMag = maxSteer * tanh(perpMag / maxSteer);
+        //float scale = min(1.0, saturatedMag / (perpMag + 1e-8));
+        //steer *= scale;
+
+        d = normalize(d + config.torque_k * steer * config.dt);
+        dir = vec4(d, 0);
+    }
 
     //randomization
     vec4 random = get_random_01_vec4(p);
-    dir += (random - 0.5) * config.randomization;
-    dir = normalize(dir);
+    vec4 random_dir = (random - 0.5) * config.randomization;
 
     //integrate position
-    vel = dir * config.velocity;
+    vel = (dir + random_dir) * config.velocity;
     pos += vel * config.dt;
 
     //prepare updated particle struct

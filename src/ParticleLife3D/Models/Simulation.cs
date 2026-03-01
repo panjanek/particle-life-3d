@@ -150,21 +150,27 @@ namespace ParticleLife3D.Models
             var rnd = new Random(1);
             for(int i=0; i< count; i++)
             {
-                particles[i].position = new Vector4((float)(config.fieldSize * rnd.NextDouble()), 
-                                                    (float)(config.fieldSize * rnd.NextDouble()),
-                                                    (float)(config.fieldSize * rnd.NextDouble()),
-                                                    0);
+                particles[i].position = new Vector4(config.fieldSize * rnd.NextSingle(),config.fieldSize * rnd.NextSingle(),config.fieldSize * rnd.NextSingle(), 0);
                 particles[i].species = rnd.Next(config.speciesCount);
 
-                particles[i].xzAngle = (float)(rnd.NextDouble() * 2 * Math.PI);
-                particles[i].yAngle = (float)((0.5 - rnd.NextDouble())*Math.PI);
-
-                float dirX = (float)(Math.Cos(particles[i].yAngle) * Math.Sin(particles[i].xzAngle));
-                float dirY = (float)(Math.Sin(particles[i].yAngle));
-                float dirZ = (float)(Math.Cos(particles[i].yAngle) * Math.Cos(particles[i].xzAngle));
-                var dir = new Vector4(dirX, dirY, dirZ, 0);
+                var dir = new Vector4(rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, 0);
                 dir.Normalize();
                 particles[i].direction = dir;
+
+
+                //sphere
+                /*
+                var center = new Vector4(config.fieldSize / 2, config.fieldSize / 2, config.fieldSize / 2, 0);
+                var radius = config.fieldSize / 2;
+                while ((particles[i].position - center).Length > radius)
+                    particles[i].position = new Vector4(config.fieldSize * rnd.NextSingle(), config.fieldSize * rnd.NextSingle(), config.fieldSize * rnd.NextSingle(), 0);
+
+
+                var inward = center - particles[i].position;
+                inward.Normalize();
+                particles[i].direction = inward;
+
+                */
             }
         }
     }

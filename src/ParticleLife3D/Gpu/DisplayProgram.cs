@@ -55,6 +55,8 @@ namespace ParticleLife3D.Gpu
             GL.BlendFunc(BlendingFactor.SrcAlpha,
                          BlendingFactor.One);
 
+            //GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             foreach (var torusOffset in torusOffsets)
             {
                 GL.UseProgram(program);
