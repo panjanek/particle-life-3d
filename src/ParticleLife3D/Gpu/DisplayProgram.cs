@@ -16,15 +16,11 @@ namespace ParticleLife3D.Gpu
 
         private int projLocation;
 
-        private int viewportSizeLocation;
-
         private int particleSizeLocation;
 
         private int viewLocation;
 
         private int torusOffsetLocation;
-
-        private int trackedPosLocation;
 
         private int quadVao;
 
@@ -40,14 +36,10 @@ namespace ParticleLife3D.Gpu
             if (projLocation == -1) throw new Exception("Uniform 'projection' not found. Shader optimized it out?");
             particleSizeLocation = GL.GetUniformLocation(program, "paricleSize");
             if (particleSizeLocation == -1) throw new Exception("Uniform 'paricleSize' not found. Shader optimized it out?");
-            viewportSizeLocation = GL.GetUniformLocation(program, "viewportSize");
-            if (viewportSizeLocation == -1) throw new Exception("Uniform 'viewportSize' not found. Shader optimized it out?");
             viewLocation = GL.GetUniformLocation(program, "view");
             if (viewLocation == -1) throw new Exception("Uniform 'view' not found. Shader optimized it out?");
             torusOffsetLocation = GL.GetUniformLocation(program, "torusOffset");
             if (torusOffsetLocation == -1) throw new Exception("Uniform 'torusOffset' not found. Shader optimized it out?");
-            trackedPosLocation = GL.GetUniformLocation(program, "trackedPos");
-            if (trackedPosLocation == -1) throw new Exception("Uniform 'trackedPos' not found. Shader optimized it out?");
 
             float[] quad =
                 {
@@ -76,6 +68,7 @@ namespace ParticleLife3D.Gpu
 
             GL.BindVertexArray(0);
 
+            /* original
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
             GL.DepthMask(true);
@@ -85,7 +78,30 @@ namespace ParticleLife3D.Gpu
                 BlendingFactor.SrcAlpha,
                 BlendingFactor.OneMinusSrcAlpha
             );
+            */
 
+            /* working
+            
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Less);
+            GL.DepthMask(false);   // IMPORTANT: do NOT write depth
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(
+                BlendingFactor.SrcAlpha,
+                BlendingFactor.One    // additive blending
+            );
+
+            GL.Disable(EnableCap.DepthTest);
+            */
+
+            GL.Disable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Lequal);
+            GL.DepthMask(false);
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha,
+                         BlendingFactor.One);
 
         }
 
@@ -102,18 +118,14 @@ namespace ParticleLife3D.Gpu
 
                 GL.UniformMatrix4(projLocation, false, ref projectionMatrix);
                 GL.Uniform1(particleSizeLocation, particleSize);
-                GL.Uniform2(viewportSizeLocation, viewportSize);
                 GL.UniformMatrix4(viewLocation, false, ref view);
                 var offset = torusOffset;
                 GL.Uniform4(torusOffsetLocation, ref offset);
-                GL.Uniform4(trackedPosLocation, ref trackedPos);
 
-                GL.DrawElementsInstanced(
-                    PrimitiveType.Triangles,
-                    6,
-                    DrawElementsType.UnsignedInt,
-                    IntPtr.Zero,
-                    particlesCount * 1
+                GL.DrawArrays(
+                    PrimitiveType.Points,
+                    0,
+                    particlesCount
                 );
             }
         }

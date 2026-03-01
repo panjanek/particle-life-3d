@@ -41,29 +41,23 @@ namespace ParticleLife3D
 
         private void parent_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                app = new AppContext();
-                app.mainWindow = this;
-                app.simulation = new Simulation();
-                app.simulation.StartSimulation(5000, 2, 300);
-                app.renderer = new OpenGlRenderer(placeholder, app);
-                app.configWindow = new ConfigWindow(app);
-                app.configWindow.Show();
-                app.configWindow.Activate();
+            app = new AppContext();
+            app.mainWindow = this;
+            app.simulation = new Simulation();
+            app.simulation.StartSimulation(5000, 2, 300);
+            app.renderer = new OpenGlRenderer(placeholder, app);
+            app.configWindow = new ConfigWindow(app);
+            app.configWindow.Show();
+            app.configWindow.Activate();
 
-                KeyDown += MainWindow_KeyDown;
-                System.Timers.Timer systemTimer = new System.Timers.Timer() { Interval = 10 };
-                systemTimer.Elapsed += SystemTimer_Elapsed;
-                systemTimer.Start();
-                DispatcherTimer infoTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(1.0) };
-                infoTimer.Tick += InfoTimer_Tick;
-                infoTimer.Start();
-            }
-            catch (Exception ex)
-            {
-                DebugUtil.Log($"Exception {ex.GetType().FullName}, {ex.Message}, {ex.StackTrace}");
-            }
+            KeyDown += MainWindow_KeyDown;
+            System.Timers.Timer systemTimer = new System.Timers.Timer() { Interval = 10 };
+            systemTimer.Elapsed += SystemTimer_Elapsed;
+            systemTimer.Start();
+            DispatcherTimer infoTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(1.0) };
+            infoTimer.Tick += InfoTimer_Tick;
+            infoTimer.Start();
+
         }
         public void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {

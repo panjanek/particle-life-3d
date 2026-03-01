@@ -22,65 +22,25 @@ layout(std430, binding = 2) buffer OutputBuffer {
 uniform mat4 view;
 uniform mat4 projection;
 uniform float paricleSize;
-uniform vec2 viewportSize;
 uniform vec4 torusOffset;
-uniform vec4 trackedPos;
 
 layout(location = 0) out vec3 vColor;
-layout(location = 1) out float vDepth;
-layout(location = 2) out float vFadingAlpha;
-layout(location = 3) out vec3 vCenterView;
-layout(location = 4) out vec2 vQuad;
-layout(location = 5) in vec2 quadPos;
-layout(location = 6) out vec3 vOffsetView;
-
-float fading_alpha(float r2)
-{
-    float sigma2 = 500*500;
-    float minAlpha = 0.5;
-    float a = exp(-(r2) / sigma2);
-    return max(a, minAlpha);
-}
+layout(location = 1) out float vFadingAlpha;
 
 void main()
 {
-    float sphereRadius = 2 * paricleSize + (viewportSize.x/1920);
-    uint id = gl_InstanceID;
+    uint id = gl_VertexID;
     Particle p = points[id];
     p.position += torusOffset;
 
-    //if tracking enabled - make everything around tracked particle fade away
-    vFadingAlpha = 1.0;
-    if (trackedPos.x > -100000)
-    {
-        vec4 d = p.position - trackedPos;
-        float r2 = dot(d, d);
-        vFadingAlpha = fading_alpha(r2);
-    }
-
-    //hide particles with this flag
-    if (p.flags == 2)
-    {
-        vFadingAlpha = 0;
-        p.position.z = 1000000;
-    }
-
-    //real spheres
     vec4 viewPos = view * vec4(p.position.xyz, 1.0);
-    vCenterView = viewPos.xyz;
-    vQuad = quadPos;
+    gl_Position = projection * viewPos;
 
-    // In VIEW SPACE the camera basis is fixed
-    float inflate = 1.5;
-    vec3 offset = vec3(quadPos * sphereRadius * inflate, 0.0);
+    float distance = -viewPos.z; 
+    gl_PointSize = paricleSize / distance;
 
-    vOffsetView = offset;
 
-    vec4 pos = viewPos + vec4(offset, 0.0);
-    gl_Position = projection * pos;
-
-    // species coloring as before
-        const vec3 colors[] = vec3[](
+    const vec3 colors[] = vec3[](
         vec3(0.0, 1.0, 0.0), // green
         vec3(0.0, 0.0, 1.0), // blue
         vec3(1.0, 0.0, 0.0), // red
@@ -93,6 +53,6 @@ void main()
 
     vColor = colors[p.species % 8];
 
-    if (p.flags == 1)
-        vColor = vColor*2;
+    float fogDensity = 0.0005;    
+    vFadingAlpha = exp(-fogDensity * distance);
 }
