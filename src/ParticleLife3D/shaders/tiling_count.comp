@@ -21,6 +21,7 @@ struct ShaderConfig {
     int cellCount;
     int totalCellCount;
     float maxSteer;
+    float flow;
 };
 
 struct Particle
