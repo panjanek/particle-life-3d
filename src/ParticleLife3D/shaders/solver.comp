@@ -141,7 +141,7 @@ void torus_dist(inout vec4 d)
 float evaluateForceForOffset(uint offset, float dist)
 {
     // Clamp distance to valid range
-    dist = clamp(dist, forces[offset].x, forces[offset+5].x);
+    dist = clamp(dist, forces[offset].x, forces[offset+KEYPOINTS_COUNT-1].x);
 
     // Find the segment [i, i+1] that contains dist
     for (int i = 0; i < KEYPOINTS_COUNT-1; ++i)
