@@ -160,11 +160,11 @@ float evaluateForceForOffset(uint offset, float dist)
     return 0.0;
 }
 
-vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
+void compute_single_acceleration(vec4 sensorPos, Particle p, Particle other, out vec4 single_acc)
 {
     vec4 d = other.position - sensorPos; 
     torus_dist(d);
-    vec4 single_acc = vec4(0,0,0,0);
+    single_acc = vec4(0,0,0,0);
     if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
     {
         float r2 = dot(d, d);
@@ -173,8 +173,6 @@ vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
         float f = evaluateForceForOffset(forceOffset, r);
         single_acc = f * d / r;
     }
-
-    return single_acc;
 }
 
 int wrapCell(int c)
@@ -182,7 +180,7 @@ int wrapCell(int c)
     return (c % config.cellCount + config.cellCount) % config.cellCount;
 }
 
-vec4 compute_total_acceleration(vec4 sensorPos, uint idx, Particle p)
+void compute_total_acceleration(vec4 sensorPos, uint idx, Particle p, out vec4 acc)
 {
     int cellCount2 = config.cellCount * config.cellCount;
     int gridX = p.cellIndex % config.cellCount;
@@ -190,7 +188,7 @@ vec4 compute_total_acceleration(vec4 sensorPos, uint idx, Particle p)
     int gridZ = p.cellIndex / (cellCount2);
     ivec3 main = ivec3(gridX, gridY, gridZ);
 
-    vec4 acc = vec4(0.0);
+    acc = vec4(0.0);
     for (int dz = -1; dz <= 1; dz++)
     for (int dy = -1; dy <= 1; dy++)
     for (int dx = -1; dx <= 1; dx++)
@@ -210,12 +208,12 @@ vec4 compute_total_acceleration(vec4 sensorPos, uint idx, Particle p)
             if (idx != otherIdx)
             {
                  Particle other = inParticles[otherIdx];
-                 acc += compute_single_acceleration(sensorPos, p, other);
+                 vec4 single_acc;
+                 compute_single_acceleration(sensorPos, p, other, single_acc);
+                 acc += single_acc;
             }
         }
     }
-
-    return acc;
 }
 
 void update_one(uint idx)
@@ -227,7 +225,8 @@ void update_one(uint idx)
 
     //compute force acting on a sensor
     vec4 sensorPos = pos + config.sensorDist * dir;
-    vec4 acc = compute_total_acceleration(sensorPos, idx, p);
+    vec4 acc;
+    compute_total_acceleration(sensorPos, idx, p, acc);
 
     //apply torque to the particle
     vec3 d = dir.xyz;
