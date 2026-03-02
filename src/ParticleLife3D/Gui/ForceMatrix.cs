@@ -167,7 +167,7 @@ namespace ParticleLife3D.Gui
                     {
                         var offset = Simulation.GetForceOffset(x, y);
                         double val = 0;
-                        for (int i = 1; i < Simulation.KeypointsCount; i++)
+                        for (int i = 0; i < Simulation.KeypointsCount; i++)
                         {
                             val += forces[offset + i].Y;
                         }

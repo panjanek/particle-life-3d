@@ -233,6 +233,12 @@ void update_one(uint idx)
     vec3 d = dir.xyz;
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
+
+    float max_a = 3; //?
+    float mag_a = length(a_perp);
+    if (mag_a > max_a)
+        a_perp *= max_a / mag_a;
+
     d = normalize(d + config.torque_k * a_perp * config.dt);
     dir = vec4(d, 0);
 
