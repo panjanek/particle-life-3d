@@ -20,7 +20,7 @@ struct ShaderConfig {
     float torque_k;
     int cellCount;
     int totalCellCount;
-    ivec4 disabled[4];
+    float maxSteer;
 };
 
 struct Particle
@@ -234,10 +234,9 @@ void update_one(uint idx)
     vec3 a = acc.xyz;
     vec3 a_perp = a - d * dot(d, a);
 
-    float max_a = 3; //?
     float mag_a = length(a_perp);
-    if (mag_a > max_a)
-        a_perp *= max_a / mag_a;
+    if (mag_a > 3)
+        a_perp *= 3 / mag_a;
 
     d = normalize(d + config.torque_k * a_perp * config.dt);
     dir = vec4(d, 0);
@@ -262,10 +261,6 @@ void update_one(uint idx)
         p.flags = 1;
         tracked = p;
     }
-
-    bool isDisabled = config.disabled[p.species / 4][p.species % 4] != 0;
-    if (isDisabled)
-        p.flags = 2;
 
     outParticles[idx] = p;
 }

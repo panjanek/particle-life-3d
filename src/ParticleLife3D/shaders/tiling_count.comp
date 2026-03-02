@@ -7,20 +7,20 @@ layout(local_size_x = {LocalSizeX}) in;
 struct ShaderConfig {
     int particleCount;
     float dt;
-    float sigma2;
-    float clampVel;
-    float clampAcc;
+    float sensorDist;
+    float t;
+    float randomization;
     float fieldSize;
     float cellSize;
     float maxDist;
     int speciesCount;
-    float damping;
+    float velocity;
     int trackedIdx;
     float maxForce;
-    float amp;
+    float torque_k;
     int cellCount;
     int totalCellCount;
-    ivec4 disabled[4];
+    float maxSteer;
 };
 
 struct Particle

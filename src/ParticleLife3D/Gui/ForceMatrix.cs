@@ -28,8 +28,6 @@ namespace ParticleLife3D.Gui
 
         public int SelectedY { get; set; }
 
-        public int[] Disabled { get; set; }
-
         public Action SelectionChanged { get; set; }
 
         private int speciesCount { get; set; }
@@ -44,7 +42,6 @@ namespace ParticleLife3D.Gui
             rectangles = new Rectangle[Simulation.MaxSpeciesCount, Simulation.MaxSpeciesCount];
             verticalDots = new Ellipse[Simulation.MaxSpeciesCount];
             horizontalDots = new Ellipse[Simulation.MaxSpeciesCount];
-            Disabled = new int[Simulation.MaxSpeciesCount];
             SelectedX = 0;
             SelectedY = 0;
             Loaded += ForceMatrix_Loaded;
@@ -109,7 +106,6 @@ namespace ParticleLife3D.Gui
         {
             var dot = (Ellipse)sender;
             var i = WpfUtil.GetTagAsInt(dot);
-            Disabled[i] = 1 - Disabled[i];
             UpdateDots();
             if (SelectionChanged != null)
                 SelectionChanged();
@@ -143,8 +139,6 @@ namespace ParticleLife3D.Gui
                 var mainBrush = DotBrushes[i % DotBrushes.Length];
                 var mainColor = DotColors[i % DotColors.Length];
                 var res = mainBrush;
-                if (Disabled[i] == 1) 
-                    res = new SolidColorBrush(Color.FromArgb(128, (byte)(mainColor.R/2), (byte)(mainColor.G/2), (byte)(mainColor.B/2)));
 
                 if (i >= speciesCount)
                     res = Brushes.Black;

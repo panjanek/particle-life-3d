@@ -41,8 +41,6 @@ namespace ParticleLife3D.Gui
             forceMatrix.SelectionChanged = () =>
             {
                 UpdateGraph();
-                for (int i = 0; i < Simulation.MaxSpeciesCount; i++)
-                    app.simulation.config.disabled[i] = forceMatrix.Disabled[i];
             };
             randomButton.PreviewKeyDown += (s, e) => e.Handled=true;
             restartButton.PreviewKeyDown += (s, e) => e.Handled = true;

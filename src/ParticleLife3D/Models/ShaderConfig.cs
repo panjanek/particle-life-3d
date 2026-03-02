@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ParticleLife3D.Models
 {
-    [StructLayout(LayoutKind.Explicit, Size = 104)]
+    [StructLayout(LayoutKind.Explicit, Size = 64)]
     public unsafe struct ShaderConfig
     {
         public ShaderConfig()
@@ -45,8 +45,6 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(56)] public int totalCellCount = 0;
 
-        [FieldOffset(60)] int _pad1;
-
-        [FieldOffset(64)] public fixed int disabled[Simulation.MaxSpeciesCount];
+        [FieldOffset(60)] public float maxSteer = 3f;
     }
 }
