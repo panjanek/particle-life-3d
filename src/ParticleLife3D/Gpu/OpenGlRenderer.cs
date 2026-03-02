@@ -250,7 +250,9 @@ namespace ParticleLife3D.Gpu
             }
             else
             {
-                //center += new Vector4(0, 0, 0.15f, 0);
+                var cameraDir = GetCameraDirection();
+                cameraDir.Normalize();
+                center += 0.15f * cameraDir;
             }
             center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
         }
@@ -365,7 +367,7 @@ namespace ParticleLife3D.Gpu
         private void Capture()
         {
             //combine PNGs into video:
-            //mp4: ffmpeg -f image2 -framerate 60 -i rec-3d/frame_%05d.png -r 60 -vcodec libx264 -preset veryslow -crf 12 -profile:v high -pix_fmt yuv420p out.mp4 -y
+            //mp4: ffmpeg -f image2 -framerate 60 -i rec/frame_%05d.png -r 60 -vcodec libx264 -preset veryslow -crf 12 -profile:v high -pix_fmt yuv420p out.mp4 -y
             //gif: ffmpeg -framerate 60 -ss 2 -i rec/frame_%05d.png -vf "select='not(mod(n,2))',setpts=N/FRAME_RATE/TB" -t 5 -r 20 simple2.gif
             //cut: ffmpeg -ss 35 -i move-full.mp4 -t 35 -c copy chase-1.mp4
             var recDir = app.configWindow.recordDir?.ToString();

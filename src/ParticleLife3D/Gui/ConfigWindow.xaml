@@ -136,6 +136,8 @@
                     <ComboBoxItem>25000</ComboBoxItem>
                     <ComboBoxItem>50000</ComboBoxItem>
                     <ComboBoxItem>100000</ComboBoxItem>
+                    <ComboBoxItem>200000</ComboBoxItem>
+                    <ComboBoxItem>300000</ComboBoxItem>
                     <ComboBoxItem>500000</ComboBoxItem>
                     <ComboBoxItem>1000000</ComboBoxItem>
                 </ComboBox>
