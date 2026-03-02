@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="ConfigWindow" 
         Width="350"
-        Height="860"  
+        Height="890"  
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterOwner"
         WindowState="Normal"
@@ -69,6 +69,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/> <!-- 9 -->
 
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -211,12 +212,18 @@
                 <Slider Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="2" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.randomization" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="12" Grid.Column="2" Tag="config.randomization"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                
+
+                <!-- maxSteer -->
+                <TextBlock Grid.Row="13" Grid.Column="0" Text="Max steer ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Maximum steering force"/>
+                <Slider Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.5" Maximum="5" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="config.maxSteer" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="13" Grid.Column="2" Tag="config.maxSteer"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+
                 <!-- forces -->
-                <TextBlock Grid.Row="13" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
-                <local:ForceMatrix Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
-                <local:ForceGraph Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
-                <Grid Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
+                <TextBlock Grid.Row="14" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
+                <local:ForceMatrix Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
+                <local:ForceGraph Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
+                <Grid Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>

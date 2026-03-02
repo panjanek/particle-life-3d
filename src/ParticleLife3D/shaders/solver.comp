@@ -235,8 +235,8 @@ void update_one(uint idx)
     vec3 a_perp = a - d * dot(d, a);
 
     float mag_a = length(a_perp);
-    if (mag_a > 3)
-        a_perp *= 3 / mag_a;
+    if (mag_a > config.maxSteer)
+        a_perp *= config.maxSteer / mag_a;
 
     d = normalize(d + config.torque_k * a_perp * config.dt);
     dir = vec4(d, 0);
