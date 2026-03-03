@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace ParticleLife3D.Models
         public float fogDensity = 0.0005f;
 
         public float forwardMove = 0.15f;
+
+        public int torusRepeats = 2;
 
         [JsonIgnore]
         public Particle[] particles;

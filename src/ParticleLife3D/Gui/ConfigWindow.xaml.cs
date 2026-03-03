@@ -107,11 +107,20 @@ namespace ParticleLife3D.Gui
                 forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
             };
 
+            duplicationCombo.SelectionChanged += (s, e) => 
+            {
+                var str = WpfUtil.GetComboSelectionAsString(duplicationCombo);
+                if (int.TryParse(str, out var number))
+                    app.simulation.torusRepeats = number;
+                    
+            };
+
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
         }
 
+
         private void Invert(int offset)
-        {
+        {  
             for (int i = 1; i < Simulation.KeypointsCount; i++)
                 app.simulation.forces[offset + i].Y *= -1;
             UpdateActiveControls();

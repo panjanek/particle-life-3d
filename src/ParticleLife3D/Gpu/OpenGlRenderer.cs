@@ -29,7 +29,6 @@ namespace ParticleLife3D.Gpu
 
         public const float DirectionChangeSpeed = 0.003f;
 
-        public const int TorusRepeats = 2;
         public int FrameCounter => frameCounter;
 
         public bool Paused { get; set; }
@@ -320,10 +319,11 @@ namespace ParticleLife3D.Gpu
             Vector3 camPos = center.Xyz;
             Vector3 camDir = GetCameraDirection().Xyz;
 
+            var repeats = app.simulation.torusRepeats;
             List<Vector4> torusOffsets = new List<Vector4>();
-            for (int tx = -TorusRepeats; tx <= TorusRepeats; tx++)
-                for (int ty = -TorusRepeats; ty <= TorusRepeats; ty++)
-                    for (int tz = -TorusRepeats; tz <= TorusRepeats; tz++)
+            for (int tx = -repeats; tx <= repeats; tx++)
+                for (int ty = -repeats; ty <= repeats; ty++)
+                    for (int tz = -repeats; tz <= repeats; tz++)
                     {
                         var torusOffset = new Vector4(tx * S, ty * S, tz * S, 0);
                         Vector3 repeatCenter = localCenter + torusOffset.Xyz;
