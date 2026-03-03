@@ -47,6 +47,6 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(60)] public float maxSteer = 3f;
 
-        [FieldOffset(64)] public float flow = 0.25f;
+        [FieldOffset(64)] public float flow = -0.1f;
     }
 }

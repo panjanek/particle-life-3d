@@ -3,7 +3,10 @@
 layout(location = 0) in vec3 vColor;
 layout(location = 1) in float vFadingAlpha;
 
+uniform float softness;
+
 out vec4 outputColor;
+
 
 void main()
 {
@@ -14,7 +17,6 @@ void main()
     if (r > 1.0)
         discard;
 
-    float softness = 3.0;
     float alpha = exp(-softness * r * r);
 
     alpha *= vFadingAlpha;

@@ -19,9 +19,13 @@ namespace ParticleLife3D.Models
 
         public ShaderConfig config;
 
-        public float cameraFollowSpeed = 1f;
-
         public float particleSize = 3000f;
+
+        public float particleSoftness = 3.0f;
+
+        public float fogDensity = 0.0005f;
+
+        public float forwardMove = 0.15f;
 
         [JsonIgnore]
         public Particle[] particles;
@@ -112,7 +116,7 @@ namespace ParticleLife3D.Models
             else if (i < j)
                 SetSimpleForce(i, j, -0.5f * m, 0);
             else 
-                SetSimpleForce(i, j, -0.4f * m, 0);
+                SetSimpleForce(i, j, 0.1f * m, 0);
         }
 
         public void InitializeParticles(int count)

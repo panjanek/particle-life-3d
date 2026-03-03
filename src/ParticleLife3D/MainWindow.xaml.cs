@@ -18,9 +18,6 @@ using Application = System.Windows.Application;
 
 namespace ParticleLife3D
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private bool uiPending;
@@ -44,7 +41,7 @@ namespace ParticleLife3D
             app = new AppContext();
             app.mainWindow = this;
             app.simulation = new Simulation();
-            app.simulation.StartSimulation(5000, 2, 300);
+            app.simulation.StartSimulation(5000, 3, 300);
             app.renderer = new OpenGlRenderer(placeholder, app);
             app.configWindow = new ConfigWindow(app);
             app.configWindow.Show();

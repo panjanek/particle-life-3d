@@ -22,6 +22,7 @@ layout(std430, binding = 2) buffer OutputBuffer {
 uniform mat4 view;
 uniform mat4 projection;
 uniform float paricleSize;
+uniform float fogDensity;
 uniform vec4 torusOffset;
 
 layout(location = 0) out vec3 vColor;
@@ -44,19 +45,15 @@ void main()
     const vec3 colors[] = vec3[](
         vec3(0.2, 1.0, 0.2), // green
         vec3(0.2, 0.2, 1.0), // blue
-        vec3(1.0, 0.0, 0.0), // red
-        vec3(1.0, 1.0, 0.0), // yellow
-        vec3(1.0, 0.0, 1.0), // magenta
-        vec3(0.0, 1.0, 1.0), // cyan
+        vec3(1.0, 0.2, 0.2), // red
+        vec3(1.0, 1.0, 0.2), // yellow
+        vec3(1.0, 0.2, 1.0), // magenta
+        vec3(0.2, 1.0, 1.0), // cyan
         vec3(1.0, 1.0, 1.0), // white
         vec3(0.5, 0.5, 0.5)  // gray
     );
 
     vColor = colors[p.species % 8];
-
-    float fogDensity = 0.0005;    
+   
     vFadingAlpha = exp(-fogDensity * distance);
-
-    //gl_Position = vec4(0,0,0,1);
-    //gl_PointSize = 20.0;
 }

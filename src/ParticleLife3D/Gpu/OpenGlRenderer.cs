@@ -241,20 +241,19 @@ namespace ParticleLife3D.Gpu
                 var tracked = solverProgram.GetTrackedParticle();
                 var cameraPosition = tracked.position - GetCameraDirection() * app.simulation.followDistance; //move camera to back of tracked particle
                 var delta = cameraPosition - center;
-                var translate = delta * app.simulation.cameraFollowSpeed;
-                //center += translate;
+                var translate = delta;
                 var newCenter = center + translate;
                 center = newCenter;
-                //center = 0.95f * center + 0.05f * newCenter;
                 //do not correct torus then tracking not to interfere with fade. tracked.position will be torus corrected anyway
             }
             else
             {
                 var cameraDir = GetCameraDirection();
                 cameraDir.Normalize();
-                center += 0.15f * cameraDir;
+                center += app.simulation.forwardMove * cameraDir;
+                center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
             }
-            center = MathUtil.TorusCorrection(center, app.simulation.config.fieldSize);
+            
         }
 
         public void ResetOrigin()
@@ -300,14 +299,14 @@ namespace ParticleLife3D.Gpu
         {
             FollowTrackedParticle();
             var torusOffsets = GetVisibleTorusOffsets();
-            var trackedPos = TrackedIdx.HasValue ? solverProgram.GetTrackedParticle().position : new Vector4(-1000000, 0, 0, 0);
-            displayProgram.Run(GetProjectionMatrix(),
+            displayProgram.Run(
+                GetProjectionMatrix(),
+                GetViewMatrix(),
                 app.simulation.config.particleCount,
                 app.simulation.particleSize,
-                new Vector2(glControl.Width, glControl.Height),
-                GetViewMatrix(),
-                torusOffsets,
-                trackedPos);
+                app.simulation.particleSoftness,
+                app.simulation.fogDensity,
+                torusOffsets);
             glControl.SwapBuffers();
             frameCounter++;
             Capture();

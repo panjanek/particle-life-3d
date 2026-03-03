@@ -77,6 +77,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- 19 -->
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
@@ -193,10 +195,10 @@
                 <Slider Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="1" Minimum="2" Maximum="100" SmallChange="0.1" LargeChange="0.5" ValueChanged="Slider_ValueChanged" Tag="config.maxForce" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="8" Grid.Column="2" Tag="config.maxForce"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- cameraFollowSpeed -->
-                <TextBlock Grid.Row="9" Grid.Column="0" Text="Speed of camera ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Speed of camera when right-clicked on partice. Does not affect simulation"/>
-                <Slider Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.01" Maximum="1" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="cameraFollowSpeed" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="9" Grid.Column="2" Tag="cameraFollowSpeed"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <!-- forwardMove -->
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="Speed of camera ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Speed of camera forward move"/>
+                <Slider Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="1" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="forwardMove" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="9" Grid.Column="2" Tag="forwardMove"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
                 
                 <!-- particleSize -->
                 <TextBlock Grid.Row="10" Grid.Column="0" Text="Particle size ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Screen size of particle. Does not affect simulation"/>
@@ -224,12 +226,22 @@
                 <Slider Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="1" Minimum="-3" Maximum="3" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="config.flow" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="14" Grid.Column="2" Tag="config.flow"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                
+                <!-- softness -->
+                <TextBlock Grid.Row="15" Grid.Column="0" Text="Particle softness ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual softness"/>
+                <Slider Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="20" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="15" Grid.Column="2" Tag="particleSoftness"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+                <!-- fogDensity -->
+                <TextBlock Grid.Row="16" Grid.Column="0" Text="Fog density ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual fog density"/>
+                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.01" SmallChange="0.0001" LargeChange="0.0002" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="16" Grid.Column="2" Tag="fogDensity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
+
                 <!-- forces -->
-                <TextBlock Grid.Row="15" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
-                <local:ForceMatrix Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
-                <local:ForceGraph Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
-                <Grid Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
+                <TextBlock Grid.Row="17" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
+                <local:ForceMatrix Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
+                <local:ForceGraph Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
+                <Grid Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -240,12 +252,6 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <Button Grid.Row="0" Grid.Column="0" Name="invertButton" ToolTip="Invert values (apart from first)">Invert</Button>
-                    <Button Grid.Row="0" Grid.Column="1" Name="symetricButton" ToolTip="Copy values to opposite particle">Symetric</Button>
-                    <Button Grid.Row="0" Grid.Column="2" Name="asymetricButton" ToolTip="Copy Inverted values to opposite particle">Asymetric</Button>
-                    <CheckBox Grid.Row="1" Grid.Column="0" Name="symetricCheckbox" ToolTip="Maintain symetric matrix" Foreground="White">Symetric</CheckBox>
-                    <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Name="everythingSymetricButton" ToolTip="Makes entire matrix symmetric">Make martix symetric</Button>
                 </Grid>
             </Grid>
         </DockPanel>

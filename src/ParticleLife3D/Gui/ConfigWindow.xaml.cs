@@ -104,33 +104,7 @@ namespace ParticleLife3D.Gui
                 var offset = Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY);
                 for (int i = 0; i < Simulation.KeypointsCount; i++)
                     app.simulation.forces[offset + i] = forceGraph.Forces[i];
-                if (symetricCheckbox.IsChecked == true && forceMatrix.SelectedX != forceMatrix.SelectedY)
-                {
-                    var offset2 = Simulation.GetForceOffset(forceMatrix.SelectedY, forceMatrix.SelectedX);
-                    for (int i = 0; i < Simulation.KeypointsCount; i++)
-                        app.simulation.forces[offset2 + i] = forceGraph.Forces[i];
-                }
-
                 forceMatrix.UpdateCells(app.simulation.forces, app.simulation.config.speciesCount, app.simulation.config.maxForce);
-            };
-
-            invertButton.Click += (s, e) => Invert(Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY));
-            symetricButton.Click += (s, e) => CopyTo(Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY), Simulation.GetForceOffset(forceMatrix.SelectedY, forceMatrix.SelectedX));
-            asymetricButton.Click += (s, e) => 
-            {
-                if (forceMatrix.SelectedX != forceMatrix.SelectedY)
-                {
-                    CopyTo(Simulation.GetForceOffset(forceMatrix.SelectedX, forceMatrix.SelectedY), Simulation.GetForceOffset(forceMatrix.SelectedY, forceMatrix.SelectedX));
-                    Invert(Simulation.GetForceOffset(forceMatrix.SelectedY, forceMatrix.SelectedX));
-                }
-            };
-
-            everythingSymetricButton.Click += (s, e) =>
-            {
-                for (int i = 0; i < app.simulation.config.speciesCount; i++)
-                    for(int j=0; j<i; j++)
-                        CopyTo(Simulation.GetForceOffset(i,j), Simulation.GetForceOffset(j,i));
-
             };
 
             KeyDown += (s, e) => app.mainWindow.MainWindow_KeyDown(s, e);
