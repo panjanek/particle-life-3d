@@ -263,7 +263,7 @@ void update_one(uint idx)
 
     //randomization
     vec4 random = get_random_01_vec4(p);
-    dir += (random - 0.5) * config.randomization;
+    dir += (random - 0.5) * config.randomization * config.dt;
     dir = normalize(dir);
 
     //integrate position

@@ -23,7 +23,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(12)] public float t = 0;
 
-        [FieldOffset(16)] public float randomization = 0.1f;
+        [FieldOffset(16)] public float randomization = 0.5f;
 
         [FieldOffset(20)] public float fieldSize = 800;
 
