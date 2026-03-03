@@ -14,7 +14,7 @@ namespace ParticleLife3D.Models
 {
     public class Simulation
     {
-        public const int MaxSpeciesCount = 10;
+        public const int MaxSpeciesCount = 6;
 
         public const int KeypointsCount = 3;
 
@@ -28,7 +28,7 @@ namespace ParticleLife3D.Models
 
         public float forwardMove = 0.15f;
 
-        public int torusRepeats = 2;
+        public int torusRepeats = 4;
 
         [JsonIgnore]
         public Particle[] particles;
@@ -71,6 +71,8 @@ namespace ParticleLife3D.Models
             config.particleCount = particlesCount;
             InitializeParticles(particlesCount);
             var rnd = new Random(seed);
+            InitializeForces();
+            /*
             if (speciesCount > previousSpeciesCount)
             {
                 for(int i = previousSpeciesCount; i< speciesCount; i++)
@@ -80,7 +82,7 @@ namespace ParticleLife3D.Models
                         InitialOneForce(i, j, rnd);
                     }
                 }
-            }
+            }*/
         }
 
         public static int GetForceOffset(int specMe, int specOther)
@@ -99,7 +101,7 @@ namespace ParticleLife3D.Models
             forces[offset + 2] = new Vector4(2 * d, val1, 0, 0);
         }
 
-        public void InitializeRandomForces()
+        public void InitializeForces()
         {
             var rnd = new Random(seed); //4
             for (int i = 0; i < config.speciesCount; i++)

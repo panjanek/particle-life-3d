@@ -60,7 +60,7 @@ namespace ParticleLife3D.Gui
             {
                 app.simulation.InitializeParticles(app.simulation.config.particleCount);
                 app.simulation.seed++;
-                app.simulation.InitializeRandomForces();
+                app.simulation.InitializeForces();
                 app.renderer.UploadParticleData();
                 app.renderer.ResetOrigin();
                 ResetMatrix();

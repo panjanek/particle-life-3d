@@ -39,7 +39,7 @@ struct Particle
    vec4 direction;
 };
 
-#define MAX_SPECIES_COUNT     10
+#define MAX_SPECIES_COUNT     6
 #define KEYPOINTS_COUNT       3
 #define FORCE_COUNT           (MAX_SPECIES_COUNT * MAX_SPECIES_COUNT * KEYPOINTS_COUNT)
 

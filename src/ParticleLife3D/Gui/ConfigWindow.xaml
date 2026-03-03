@@ -238,12 +238,13 @@
                 <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.01" SmallChange="0.0001" LargeChange="0.0002" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="16" Grid.Column="2" Tag="fogDensity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
+                <!-- torus repeats -->
                 <TextBlock Grid.Row="17" Grid.Column="0" Text="Torus duplication" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
                 <ComboBox Name="duplicationCombo" Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,10,0">
                     <ComboBoxItem>1</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">2</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
                     <ComboBoxItem>3</ComboBoxItem>
-                    <ComboBoxItem>4</ComboBoxItem>
+                    <ComboBoxItem IsSelected="True">4</ComboBoxItem>
                     <ComboBoxItem>5</ComboBoxItem>
                     <ComboBoxItem>6</ComboBoxItem>
                     <ComboBoxItem>7</ComboBoxItem>
@@ -254,8 +255,8 @@
 
                 <!-- forces -->
                 <TextBlock Grid.Row="18" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
-                <local:ForceMatrix Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="200" x:Name="forceMatrix" Margin="10,30,0,0"/>
-                <local:ForceGraph Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="150" x:Name="forceGraph" Margin="0,10,0,0"/>
+                <local:ForceMatrix Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Width="120" Height="120" x:Name="forceMatrix" Margin="10,30,0,0"/>
+                <local:ForceGraph Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="100" x:Name="forceGraph" Margin="0,10,0,0"/>
                 <Grid Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
