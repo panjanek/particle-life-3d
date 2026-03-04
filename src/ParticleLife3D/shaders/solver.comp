@@ -161,28 +161,28 @@ float evaluateForceForOffset(uint offset, float dist)
     return 0.0;
 }
 
-vec4 compute_single_acceleration(vec4 sensorPos, Particle p, Particle other)
+vec4 compute_single_steer(vec4 sensorPos, Particle p, Particle other)
 {
     vec4 d = other.position - sensorPos; 
     torus_dist(d);
-    vec4 single_acc = vec4(0,0,0,0);
+    vec4 single_steer = vec4(0,0,0,0);
     if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
     {
         float r2 = dot(d, d);
         float r = sqrt(r2);
         uint forceOffset = (p.species * MAX_SPECIES_COUNT + other.species) * KEYPOINTS_COUNT;
         float f = evaluateForceForOffset(forceOffset, r);
-        single_acc = f * d / r;
+        single_steer = f * d / r;
     }
 
-    return single_acc;
+    return single_steer;
 }
 
-vec4 compute_single_flow(Particle p, Particle other)
+void compute_single_flow(Particle p, Particle other, out vec4 single_flow)
 {
-    vec4 single_flow = vec4(0,0,0,0);
+    single_flow = vec4(0,0,0,0);
     if (p.species != other.species)
-        return single_flow;
+        return;
 
     vec4 d = other.position - p.position; 
     torus_dist(d);
@@ -191,8 +191,6 @@ vec4 compute_single_flow(Particle p, Particle other)
         float r2 = dot(d, d);
         single_flow = other.direction / (1 + r2);
     }
-
-    return single_flow;
 }
 
 int wrapCell(int c)
@@ -200,7 +198,7 @@ int wrapCell(int c)
     return (c % config.cellCount + config.cellCount) % config.cellCount;
 }
 
-void compute_total_acceleration(vec4 sensorPos, uint idx, Particle p, out vec4 acc, out vec4 flow)
+void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 steer, out vec4 flow)
 {
     int cellCount2 = config.cellCount * config.cellCount;
     int gridX = p.cellIndex % config.cellCount;
@@ -208,7 +206,7 @@ void compute_total_acceleration(vec4 sensorPos, uint idx, Particle p, out vec4 a
     int gridZ = p.cellIndex / (cellCount2);
     ivec3 main = ivec3(gridX, gridY, gridZ);
 
-    acc = vec4(0.0);
+    steer = vec4(0.0);
     flow = vec4(0.0);
     for (int dz = -1; dz <= 1; dz++)
     for (int dy = -1; dy <= 1; dy++)
@@ -229,8 +227,11 @@ void compute_total_acceleration(vec4 sensorPos, uint idx, Particle p, out vec4 a
             if (idx != otherIdx)
             {
                  Particle other = inParticles[otherIdx];
-                 acc += compute_single_acceleration(sensorPos, p, other);
-                 flow += compute_single_flow(p, other);
+                 steer += compute_single_steer(sensorPos, p, other);
+
+                 vec4 single_flow;
+                 compute_single_flow(p, other, single_flow);
+                 flow += single_flow;
             }
         }
     }
@@ -245,13 +246,13 @@ void update_one(uint idx)
 
     //compute force acting on a sensor
     vec4 sensorPos = pos + config.sensorDist * dir;
-    vec4 acc;
+    vec4 steer;
     vec4 flow;
-    compute_total_acceleration(sensorPos, idx, p, acc, flow);
+    compute_total_interactions(sensorPos, idx, p, steer, flow);
 
     //apply torque to the particle
     vec3 d = dir.xyz;
-    vec3 a = acc.xyz;
+    vec3 a = steer.xyz;
     vec3 a_perp = a - d * dot(d, a);
 
     float mag_a = length(a_perp);
