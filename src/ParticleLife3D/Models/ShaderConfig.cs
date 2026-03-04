@@ -23,7 +23,7 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(12)] public float t = 0;
 
-        [FieldOffset(16)] public float randomization = 0.5f;
+        [FieldOffset(16)] public float randomization = 1.0f;
 
         [FieldOffset(20)] public float fieldSize = 800;
 
@@ -49,6 +49,8 @@ namespace ParticleLife3D.Models
 
         [FieldOffset(64)] public float flow = -0.1f;
 
-        [FieldOffset(68)] public float attraction = -0.05f;
+        [FieldOffset(68)] public float attraction = -0.1f;
+
+        [FieldOffset(72)] public float freeThreshold = 1f;
     }
 }

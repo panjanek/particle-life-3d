@@ -23,6 +23,7 @@ struct ShaderConfig {
     float maxSteer;
     float flow;
     float attraction;
+    float freeTreshold;
 };
 
 struct Particle
@@ -271,8 +272,9 @@ void update_one(uint idx)
     dir = vec4(d, 0);
 
     //randomization
+    float randomization = config.randomization;
     vec4 random = get_random_01_vec4(p);
-    dir += (random - 0.5) * config.randomization * config.dt;
+    dir += (random - 0.5) * randomization * config.dt;
     dir = normalize(dir);
 
     //integrate position

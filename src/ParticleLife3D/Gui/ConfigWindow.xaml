@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="ConfigWindow" 
         Width="350"
-        Height="820"  
+        Height="850"  
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterOwner"
         WindowState="Normal"
@@ -80,6 +80,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/> <!-- 19 -->
 
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
@@ -229,25 +230,31 @@
                 <Slider Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="1" Minimum="-3" Maximum="3" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="config.flow" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="14" Grid.Column="2" Tag="config.flow"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- flow -->
+                <!-- attraction -->
                 <TextBlock Grid.Row="15" Grid.Column="0" Text="Attraction / repulsion ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Small attraction / repulsion force"/>
                 <Slider Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="1" Minimum="-0.5" Maximum="0.5" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.attraction" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="15" Grid.Column="2" Tag="config.attraction"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                
+                <!-- freeThreshold -->
+                <!--
+                <TextBlock Grid.Row="16" Grid.Column="0" Text="freeThreshold ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="freeThreshold"/>
+                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="5" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.freeThreshold" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="16" Grid.Column="2" Tag="config.freeThreshold"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                 -->
+
                 <!-- softness -->
-                <TextBlock Grid.Row="16" Grid.Column="0" Text="Particle softness ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual softness"/>
-                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="20" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="16" Grid.Column="2" Tag="particleSoftness"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <TextBlock Grid.Row="17" Grid.Column="0" Text="Particle softness ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual softness"/>
+                <Slider Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="20" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="17" Grid.Column="2" Tag="particleSoftness"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- fogDensity -->
-                <TextBlock Grid.Row="17" Grid.Column="0" Text="Fog density ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual fog density"/>
-                <Slider Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.01" SmallChange="0.0001" LargeChange="0.0002" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="17" Grid.Column="2" Tag="fogDensity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+                <TextBlock Grid.Row="18" Grid.Column="0" Text="Fog density ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual fog density"/>
+                <Slider Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="0.001" SmallChange="0.00001" LargeChange="0.0001" ValueChanged="Slider_ValueChanged" Tag="fogDensity" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="18" Grid.Column="2" Tag="fogDensity"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- torus repeats -->
-                <TextBlock Grid.Row="18" Grid.Column="0" Text="Torus duplication" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
-                <ComboBox Name="duplicationCombo" Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,10,0">
+                <TextBlock Grid.Row="19" Grid.Column="0" Text="Torus duplication" Grid.ColumnSpan="1" VerticalAlignment="Center" Margin="10,5,5,0" Foreground="White" TextWrapping="Wrap"/>
+                <ComboBox Name="duplicationCombo" Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,10,0">
                     <ComboBoxItem>1</ComboBoxItem>
                     <ComboBoxItem>2</ComboBoxItem>
                     <ComboBoxItem>3</ComboBoxItem>
@@ -261,10 +268,10 @@
                 </ComboBox>
 
                 <!-- forces -->
-                <TextBlock Grid.Row="19" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
-                <local:ForceMatrix Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2" Width="120" Height="120" x:Name="forceMatrix" Margin="10,30,0,0"/>
-                <local:ForceGraph Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="100" x:Name="forceGraph" Margin="0,10,0,0"/>
-                <Grid Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
+                <TextBlock Grid.Row="20" Grid.Column="0" Grid.RowSpan="3" Text="Forces" VerticalAlignment="Center" Margin="10,10,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Forces matrix"/>
+                <local:ForceMatrix Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2" Width="120" Height="120" x:Name="forceMatrix" Margin="10,30,0,0"/>
+                <local:ForceGraph Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2" Width="200" Height="100" x:Name="forceGraph" Margin="0,10,0,0"/>
+                <Grid Grid.Row="22" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,5,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>

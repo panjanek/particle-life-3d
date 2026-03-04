@@ -23,6 +23,7 @@ struct ShaderConfig {
     float maxSteer;
     float flow;
     float attraction;
+    float freeThreshold;
 };
 
 struct Particle

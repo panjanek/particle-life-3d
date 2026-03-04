@@ -138,6 +138,17 @@ namespace ParticleLife3D.Models
                 var dir = new Vector4(rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, rnd.NextSingle() * 2 - 1, 0);
                 dir.Normalize();
                 particles[i].direction = dir;
+
+                /*
+                var center = new Vector4(config.fieldSize / 2, config.fieldSize / 2, config.fieldSize / 2, 0);
+                var radius = config.fieldSize / 2;
+                while ((particles[i].position - center).Length > radius)
+                    particles[i].position = new Vector4(config.fieldSize * rnd.NextSingle(), config.fieldSize * rnd.NextSingle(), config.fieldSize * rnd.NextSingle(), 0);
+
+
+                var inward = center - particles[i].position;
+                inward.Normalize();
+                particles[i].direction = inward;*/
             }
         }
     }
