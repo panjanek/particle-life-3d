@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ParticleLife3D.Models
 {
-    [StructLayout(LayoutKind.Explicit, Size = 68)]
+    [StructLayout(LayoutKind.Explicit, Size = 72)]
     public unsafe struct ShaderConfig
     {
         public ShaderConfig()
@@ -48,5 +48,7 @@ namespace ParticleLife3D.Models
         [FieldOffset(60)] public float maxSteer = 3f;
 
         [FieldOffset(64)] public float flow = -0.1f;
+
+        [FieldOffset(68)] public float attraction = -0.05f;
     }
 }

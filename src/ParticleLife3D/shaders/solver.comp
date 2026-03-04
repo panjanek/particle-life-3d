@@ -22,6 +22,7 @@ struct ShaderConfig {
     int totalCellCount;
     float maxSteer;
     float flow;
+    float attraction;
 };
 
 struct Particle
@@ -178,9 +179,10 @@ vec4 compute_single_steer(vec4 sensorPos, Particle p, Particle other)
     return single_steer;
 }
 
-void compute_single_flow(Particle p, Particle other, out vec4 single_flow)
+void compute_single_flow(Particle p, Particle other, out vec4 single_flow, out vec4 single_attr)
 {
     single_flow = vec4(0,0,0,0);
+    single_attr = vec4(0,0,0,0);
     if (p.species != other.species)
         return;
 
@@ -189,7 +191,9 @@ void compute_single_flow(Particle p, Particle other, out vec4 single_flow)
     if (abs(d.x) <= config.maxDist && abs(d.y) <= config.maxDist && abs(d.z) <= config.maxDist)
     {
         float r2 = dot(d, d);
+        float r = sqrt(r2);
         single_flow = other.direction / (1 + r2);
+        single_attr = d / ((1 + r2)*r);
     }
 }
 
@@ -198,7 +202,7 @@ int wrapCell(int c)
     return (c % config.cellCount + config.cellCount) % config.cellCount;
 }
 
-void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 steer, out vec4 flow)
+void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 steer, out vec4 flow, out vec4 attr)
 {
     int cellCount2 = config.cellCount * config.cellCount;
     int gridX = p.cellIndex % config.cellCount;
@@ -208,6 +212,7 @@ void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 s
 
     steer = vec4(0.0);
     flow = vec4(0.0);
+    attr = vec4(0.0);
     for (int dz = -1; dz <= 1; dz++)
     for (int dy = -1; dy <= 1; dy++)
     for (int dx = -1; dx <= 1; dx++)
@@ -230,8 +235,10 @@ void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 s
                  steer += compute_single_steer(sensorPos, p, other);
 
                  vec4 single_flow;
-                 compute_single_flow(p, other, single_flow);
+                 vec4 single_attr;
+                 compute_single_flow(p, other, single_flow, single_attr);
                  flow += single_flow;
+                 attr += single_attr;
             }
         }
     }
@@ -244,11 +251,12 @@ void update_one(uint idx)
     vec4 pos = p.position;
     vec4 dir = p.direction;
 
-    //compute force acting on a sensor
+    //compute all forces
     vec4 sensorPos = pos + config.sensorDist * dir;
     vec4 steer;
     vec4 flow;
-    compute_total_interactions(sensorPos, idx, p, steer, flow);
+    vec4 attr;
+    compute_total_interactions(sensorPos, idx, p, steer, flow, attr);
 
     //apply torque to the particle
     vec3 d = dir.xyz;
@@ -271,8 +279,11 @@ void update_one(uint idx)
     vel = dir * config.velocity;
     pos += vel * config.dt;
 
-    //use flow
+    //apply flow from the particles of the same species
     pos += flow * config.flow;
+
+    //apply repulsion/attraction to the particles of the same species
+    pos += attr * config.attraction;
 
     //prepare updated particle struct
     torus_pos(pos);
