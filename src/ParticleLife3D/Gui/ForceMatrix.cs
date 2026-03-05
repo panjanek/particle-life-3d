@@ -20,9 +20,9 @@ namespace ParticleLife3D.Gui
     {
         private Rectangle[,] rectangles;
 
-        private Brush[] DotBrushes = [Brushes.Green, Brushes.Blue, Brushes.Red , Brushes.Yellow, Brushes.Magenta, Brushes.Cyan, Brushes.White, Brushes.Gray];
+        private Brush[] DotBrushes = [Brushes.Green, Brushes.Blue, Brushes.Magenta, Brushes.Red , Brushes.Yellow, Brushes.Cyan, Brushes.White, Brushes.Gray];
 
-        private Color[] DotColors = [Colors.Green, Colors.Blue, Colors.Red, Colors.Yellow, Colors.Magenta, Colors.Cyan , Colors.White, Colors.Gray];
+        private Color[] DotColors = [Colors.Green, Colors.Blue, Colors.Magenta, Colors.Red, Colors.Yellow, Colors.Magenta, Colors.Cyan , Colors.White, Colors.Gray];
 
         public int SelectedX { get; set; }
 
