@@ -204,11 +204,6 @@
                 <Slider Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.0" Maximum="1" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="forwardMove" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="9" Grid.Column="2" Tag="forwardMove"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
                 
-                <!-- particleSize -->
-                <TextBlock Grid.Row="10" Grid.Column="0" Text="Particle size ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Screen size of particle. Does not affect simulation"/>
-                <Slider Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="10000" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="10" Grid.Column="2" Tag="particleSize"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
-
                 <!-- sensor Distance -->
                 <TextBlock Grid.Row="11" Grid.Column="0" Text="Sensor distance ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Front sensor of an agent"/>
                 <Slider Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="100" SmallChange="0.1" LargeChange="1" ValueChanged="Slider_ValueChanged" Tag="config.sensorDist" VerticalAlignment="Center"/>
@@ -235,16 +230,15 @@
                 <Slider Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="1" Minimum="-0.5" Maximum="0.5" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.attraction" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="15" Grid.Column="2" Tag="config.attraction"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
-                <!-- freeThreshold -->
-                <!--
-                <TextBlock Grid.Row="16" Grid.Column="0" Text="freeThreshold ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="freeThreshold"/>
-                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0" Maximum="5" SmallChange="0.01" LargeChange="0.1" ValueChanged="Slider_ValueChanged" Tag="config.freeThreshold" VerticalAlignment="Center"/>
-                <TextBlock Grid.Row="16" Grid.Column="2" Tag="config.freeThreshold"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
-                 -->
+                <!-- particleSize -->
+                <TextBlock Grid.Row="16" Grid.Column="0" Text="Particle size ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Screen size of particle. Does not affect simulation"/>
+                <Slider Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="1" Minimum="1" Maximum="30000" SmallChange="1" LargeChange="10" ValueChanged="Slider_ValueChanged" Tag="particleSize" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="16" Grid.Column="2" Tag="particleSize"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
+
 
                 <!-- softness -->
                 <TextBlock Grid.Row="17" Grid.Column="0" Text="Particle softness ⓘ" VerticalAlignment="Center" Margin="10,0,8,0" TextWrapping="Wrap" Foreground="White" ToolTip="Visual softness"/>
-                <Slider Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="20" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
+                <Slider Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="1" Minimum="0.1" Maximum="50" SmallChange="0.1" LargeChange="0.2" ValueChanged="Slider_ValueChanged" Tag="particleSoftness" VerticalAlignment="Center"/>
                 <TextBlock Grid.Row="17" Grid.Column="2" Tag="particleSoftness"  FontFamily="Courier New" Margin="0,5,10,0" VerticalAlignment="Center" FontSize="11" MouseDown="infoText_MouseDown" Foreground="White" Background="DarkGray" TextAlignment="Center" Padding="1"/>
 
                 <!-- fogDensity -->
