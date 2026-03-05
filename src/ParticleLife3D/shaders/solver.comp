@@ -180,7 +180,7 @@ vec4 compute_single_steer(vec4 sensorPos, Particle p, Particle other)
     return single_steer;
 }
 
-void compute_single_flow(Particle p, Particle other, out vec4 single_flow, out vec4 single_attr)
+void compute_single_flow_and_attr(Particle p, Particle other, out vec4 single_flow, out vec4 single_attr)
 {
     single_flow = vec4(0,0,0,0);
     single_attr = vec4(0,0,0,0);
@@ -237,7 +237,7 @@ void compute_total_interactions(vec4 sensorPos, uint idx, Particle p, out vec4 s
 
                  vec4 single_flow;
                  vec4 single_attr;
-                 compute_single_flow(p, other, single_flow, single_attr);
+                 compute_single_flow_and_attr(p, other, single_flow, single_attr);
                  flow += single_flow;
                  attr += single_attr;
             }
