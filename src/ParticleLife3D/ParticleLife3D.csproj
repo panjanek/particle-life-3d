@@ -14,6 +14,7 @@
     <None Remove="shaders\solver.comp" />
   </ItemGroup>
 
+  
   <ItemGroup>
     <EmbeddedResource Include="shaders\display.frag" />
     <EmbeddedResource Include="shaders\display.vert" />
