@@ -193,6 +193,7 @@ void compute_single_flow_and_attr(Particle p, Particle other, out vec4 single_fl
     {
         float r2 = dot(d, d);
         float r = sqrt(r2);
+
         single_flow = other.direction / (1 + r2);
         single_attr = d / ((1 + r2)*r);
     }
