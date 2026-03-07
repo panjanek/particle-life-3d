@@ -46,13 +46,15 @@ void main()
 
     //if tracking enabled - make everything around tracked particle fade away
     vFadingAlpha = 1.0;
+    
     if (trackedPos.x > -100000)
     {
         vec4 d = p.position - trackedPos;
         float r2 = dot(d, d);
         vFadingAlpha = fading_alpha(r2);
     }
-
+    
+    
     //hide particles with this flag
     if (p.flags == 2)
     {
@@ -76,11 +78,15 @@ void main()
 
     // species coloring as before
         const vec3 colors[] = vec3[](
-        vec3(0.0, 1.0, 0.0), // green
+        vec3(1.0, 0.0, 1.0), // magenta
         vec3(0.0, 0.0, 1.0), // blue
         vec3(1.0, 0.0, 0.0), // red
+        
+        vec3(0.0, 1.0, 0.0), // green
+        
+        
         vec3(1.0, 1.0, 0.0), // yellow
-        vec3(1.0, 0.0, 1.0), // magenta
+        
         vec3(0.0, 1.0, 1.0), // cyan
         vec3(1.0, 1.0, 1.0), // white
         vec3(0.5, 0.5, 0.5)  // gray

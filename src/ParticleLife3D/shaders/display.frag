@@ -51,5 +51,6 @@ void main()
     float fog = exp(-fogDensity * depth);
     fog = clamp(fog, 0.0, 1.0);
 
-    outputColor = vec4(color*fog*vFadingAlpha, fog*vFadingAlpha);
+    //outputColor = vec4(color*fog*vFadingAlpha, fog*vFadingAlpha);
+    outputColor = vec4(color*fog, fog);
 }

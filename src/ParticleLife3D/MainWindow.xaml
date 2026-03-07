@@ -8,7 +8,7 @@
         Title="ParticleLife3D" Width="Auto" Height="Auto" WindowState ="Maximized" MinWidth="320" MinHeight="320">
 
     <Grid Name="parent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Loaded="parent_Loaded">
-        <Grid Name="placeholder" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Grid Name="placeholder" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="1080" Height="1920">
         </Grid>
     </Grid>
 </Window>
