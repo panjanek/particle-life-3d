@@ -4,7 +4,7 @@ This is natural progression after my previous particle life project https://gith
 
 Here, in 3D each particle is a small ball. You can zoom&pan or lock on a single particle to follow its path (double click).
 
-Video: [https://www.youtube.com/watch?v=2vt4MBxcOhs](https://www.youtube.com/watch?v=-EbrSPrlZ2M)
+Video: https://www.youtube.com/watch?v=-EbrSPrlZ2M
 
 <p align="center"><img src="https://github.com/panjanek/particle-life-3d/blob/5fc4e0ce50da1ecf3e8df0097aedb61adb6c5e54/captures/3d-forming.gif" /></p>
 
